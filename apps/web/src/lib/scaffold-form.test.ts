@@ -15,6 +15,7 @@ const valid = {
   with_s3: false,
   theme: "werft",
   build_plan: "",
+  model: "",
 }
 
 describe("scaffoldFormSchema", () => {
@@ -54,6 +55,7 @@ describe("toDispatchInputs", () => {
       "deploy",
       "description",
       "email",
+      "model",
       "region",
       "status",
       "tags",
@@ -89,5 +91,18 @@ describe("toDispatchInputs", () => {
     const parsed = scaffoldFormSchema.safeParse({ ...valid, build_plan: plan })
     expect(parsed.success).toBe(true)
     expect(parsed.success && toDispatchInputs(parsed.data).build_plan).toContain("## Screens")
+  })
+
+  it("passes the chosen model through, and blank means the subscription default", () => {
+    expect(toDispatchInputs(scaffoldFormSchema.parse({ ...valid, model: "haiku" })).model).toBe(
+      "haiku",
+    )
+    expect(toDispatchInputs(scaffoldFormSchema.parse(valid)).model).toBe("")
+  })
+
+  it("refuses a model that is not on the list, rather than forwarding it", () => {
+    // It becomes a command-line argument on the other side of the dispatch.
+    expect(scaffoldFormSchema.safeParse({ ...valid, model: "gpt-4" }).success).toBe(false)
+    expect(scaffoldFormSchema.safeParse({ ...valid, model: "opus; rm -rf /" }).success).toBe(false)
   })
 })

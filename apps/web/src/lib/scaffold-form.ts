@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { MODELS } from "./models.ts"
 
 /**
  * The /new form's contract with werft-template's scaffold-app.yml dispatch.
@@ -45,6 +46,9 @@ export const scaffoldFormSchema = z.object({
   // builds the app. 20k characters is well inside what a dispatch input and an
   // issue body both accept, and far past what a plan needs.
   build_plan: z.string().trim().max(20_000).default(""),
+  // Blank is a real choice, not a missing one: it means the subscription's
+  // default, which is what a plan with no opinion should get.
+  model: z.enum(MODELS).default(""),
 })
 
 export type ScaffoldForm = z.infer<typeof scaffoldFormSchema>
@@ -69,5 +73,6 @@ export function toDispatchInputs(form: ScaffoldForm): Record<string, string> {
     with_s3: String(form.with_s3),
     theme: form.theme,
     build_plan: form.build_plan,
+    model: form.model,
   }
 }
