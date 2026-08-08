@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { CopyButton } from "@/app/copy-button"
 import { scaffoldAction } from "./actions.ts"
+import { ThemePicker } from "./theme-picker.tsx"
 
 export const metadata: Metadata = {
   title: "New app",
@@ -99,6 +100,8 @@ export default async function NewAppPage({
           <input id="tags" name="tags" placeholder="personal, tools (comma-separated, optional)" />
         </div>
 
+        <ThemePicker name="theme" />
+
         <div className="form-row">
           <div className="form-field">
             <label htmlFor="visibility">Repository</label>
@@ -118,9 +121,30 @@ export default async function NewAppPage({
           </div>
         </div>
 
+        <div className="form-field">
+          <label htmlFor="region">Region</label>
+          <select id="region" name="region" defaultValue="">
+            <option value="">Provider default (fastest to provision)</option>
+            <option value="us-east">US East — database, functions and bucket together</option>
+            <option value="eu-central">Europe (Frankfurt) — all three together</option>
+            <option value="us-west">US West — all three together</option>
+          </select>
+          <p className="field-hint">
+            One choice co-locates the database, the functions and (if enabled) the S3 bucket.
+          </p>
+        </div>
+
         <div className="form-checks">
           <label className="check">
             <input type="checkbox" name="deploy" defaultChecked /> Deploy to production at the end
+          </label>
+          <label className="check">
+            <input type="checkbox" name="with_s3" /> Provision an S3 bucket
+            <span className="field-hint">
+              {" "}
+              — Werft mints a bucket and a key scoped to only that bucket; you never touch the AWS
+              console
+            </span>
           </label>
           <label className="check">
             <input type="checkbox" name="vercel_sso" /> Put Vercel SSO in front of the whole

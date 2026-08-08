@@ -621,3 +621,93 @@ input:hover {
 .cli-details[open] summary {
   margin-bottom: var(--space-2);
 }
+
+/* ---- theme picker -------------------------------------------------------- */
+
+.theme-picker {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.theme-picker legend {
+  padding: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-muted);
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.theme-card {
+  display: block;
+  padding: var(--space-2);
+  text-align: left;
+  color: var(--color-fg);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.theme-card.selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+/* The miniature "website": a real render in the theme's own colours. */
+.theme-preview {
+  display: block;
+  position: relative;
+  height: 5rem;
+  padding: var(--space-2);
+  border: 1px solid;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.theme-preview-title {
+  display: block;
+  font-size: 1rem;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+}
+
+.theme-preview-line {
+  display: block;
+  height: 3px;
+  width: 80%;
+  margin-top: var(--space-2);
+  border-radius: 2px;
+  opacity: 0.6;
+}
+
+.theme-preview-line.short {
+  width: 55%;
+  margin-top: 4px;
+}
+
+.theme-preview-button {
+  display: block;
+  height: 10px;
+  width: 34px;
+  margin-top: var(--space-2);
+  border-radius: 3px;
+}
+
+.theme-card-label {
+  display: block;
+  margin-top: var(--space-2);
+  font-weight: var(--font-weight-medium);
+}
+
+.theme-card-note {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--color-muted);
+}
