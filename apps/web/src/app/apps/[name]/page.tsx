@@ -3,6 +3,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { formatRelative, formatUtc } from "@/lib/time"
 import { getAppByName } from "@/registry/queries"
+import { requestFeatureAction, retireAppAction } from "./actions.ts"
 
 export const dynamic = "force-dynamic"
 
@@ -33,8 +34,15 @@ function healthLabel(health: string): string {
   return HEALTH_LABEL[health] ?? `Unrecognised state: ${health}`
 }
 
-export default async function AppDetailPage({ params }: { params: Promise<{ name: string }> }) {
+export default async function AppDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ name: string }>
+  searchParams: Promise<{ error?: string; requested?: string; retiring?: string }>
+}) {
   const { name } = await params
+  const banner = await searchParams
   const app = await getAppByName(name)
   if (!app) notFound()
 
@@ -130,11 +138,61 @@ export default async function AppDetailPage({ params }: { params: Promise<{ name
         )}
       </dl>
 
+      {banner.error && (
+        <p className="banner banner-error" role="alert">
+          {banner.error}
+        </p>
+      )}
+      {banner.requested && (
+        <p className="banner banner-ok" role="status">
+          Claude has it. An issue was filed in the repo and it will open a pull request — the five
+          gates run before anything reaches production, and you merge.
+        </p>
+      )}
+      {banner.retiring && (
+        <p className="banner banner-ok" role="status">
+          Retiring {app.title ?? app.name}. You will get an issue in werft-template saying what was
+          removed, and what survived if anything did.
+        </p>
+      )}
+
       <section className="help-box">
-        <h2>Working on this app</h2>
+        <h2>Ask for a change</h2>
+        <p className="field-hint">
+          Describe it the way you would say it out loud. It becomes an <code>@claude</code> issue in
+          this app's own repo, so Claude reads the existing code, writes the change — a database
+          migration too, if it needs one — and opens a pull request. The app's five gates run
+          against a real preview on its own database branch. You merge; nothing reaches production
+          on its own.
+        </p>
+        <form action={requestFeatureAction} className="scaffold-form">
+          <input type="hidden" name="app_name" value={app.name} />
+          <div className="form-field">
+            <label htmlFor="title">Title (optional)</label>
+            <input id="title" name="title" maxLength={80} placeholder="Add a CSV export" />
+          </div>
+          <div className="form-field">
+            <label htmlFor="request">What should change?</label>
+            <textarea
+              id="request"
+              name="request"
+              rows={8}
+              maxLength={20_000}
+              required
+              placeholder={
+                "Add a button on the dashboard that exports the current table as CSV.\n\nKeep it behind the existing login. No new dependencies."
+              }
+            />
+          </div>
+          <button type="submit">Send to Claude</button>
+        </form>
+      </section>
+
+      <section className="help-box">
+        <h2>Other ways in</h2>
         <ul>
           <li>
-            Ship a change: open a PR in{" "}
+            By hand: open a PR in{" "}
             <a href={app.repoUrl} target="_blank" rel="noreferrer">
               the repo
             </a>{" "}
@@ -142,11 +200,46 @@ export default async function AppDetailPage({ params }: { params: Promise<{ name
             itself when the PR merges.
           </li>
           <li>
-            Delegate it: comment <code>@claude</code> on an issue there and review the branch that
-            comes back.
+            From GitHub: comment <code>@claude</code> on any issue or PR there, which is the same
+            mechanism the box above uses.
           </li>
         </ul>
       </section>
+
+      {app.name !== "werft-template" && app.name !== "werft-marketplace" && (
+        <section className="help-box danger-box">
+          <h2>Retire this app</h2>
+          <p className="field-hint">
+            Removes the Vercel project, the Neon database and everything in it, any S3 bucket and
+            its scoped AWS user, and this card. <strong>None of it can be undone.</strong> The
+            GitHub repository is kept unless you tick the box, so the code survives by default.
+          </p>
+          <form action={retireAppAction} className="scaffold-form">
+            <input type="hidden" name="app_name" value={app.name} />
+            <div className="form-field">
+              <label htmlFor="confirm">
+                Type <code>{app.name}</code> to confirm
+              </label>
+              <input
+                id="confirm"
+                name="confirm"
+                required
+                autoComplete="off"
+                pattern={app.name}
+                title={`Type ${app.name} exactly`}
+                placeholder={app.name}
+              />
+            </div>
+            <label className="check">
+              <input type="checkbox" name="delete_repo" /> Also delete the GitHub repository
+              <span className="field-hint"> — the code is unrecoverable</span>
+            </label>
+            <button type="submit" className="danger-button">
+              Retire {app.title ?? app.name}
+            </button>
+          </form>
+        </section>
+      )}
     </main>
   )
 }

@@ -748,3 +748,40 @@ input:hover {
   line-height: 1.6;
   resize: vertical;
 }
+
+/* ---- outcome banners and the destructive section ------------------------- */
+
+.banner {
+  margin: var(--space-4) 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.banner-ok {
+  border-color: var(--color-success);
+}
+
+.banner-error {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+/* Retirement is the one irreversible action in the product, so it is visually
+   separated from everything else rather than sitting in the same grey box. */
+.danger-box {
+  border-color: var(--color-danger);
+}
+
+.danger-button {
+  color: var(--color-surface);
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+/* An invalid confirmation is shown as invalid before submitting, so the wrong
+   name is caught in the browser and not only on the server. */
+.danger-box input:invalid {
+  border-color: var(--color-danger);
+}
