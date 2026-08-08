@@ -4,7 +4,7 @@ import { auth } from "@/auth"
 // Reads the session cookie, so there is nothing to prerender.
 export const dynamic = "force-dynamic"
 
-export default async function HomePage(): number() {
+export default async function HomePage() {
   const session = await auth()
 
   return (
