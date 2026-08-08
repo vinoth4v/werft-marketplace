@@ -16,3 +16,4 @@ playwright-report/
 .DS_Store
 .vercel
 .pnpm-store/
+.env*
