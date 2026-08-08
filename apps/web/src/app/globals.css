@@ -720,3 +720,31 @@ input:hover {
   font-size: var(--font-size-sm);
   color: var(--color-muted);
 }
+
+/* The build plan's file-loader sits beside its character count; without this
+   the button and the counter overlap. */
+.plan-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.plan-tools button {
+  flex: none;
+}
+
+.plan-tools .field-hint {
+  margin: 0;
+}
+
+/* A plan is written here, so it gets a writing surface: monospace, resizable
+   vertically, and wide enough to see structure. */
+.scaffold-form textarea {
+  width: 100%;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  resize: vertical;
+}

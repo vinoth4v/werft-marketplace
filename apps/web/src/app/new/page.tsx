@@ -168,8 +168,8 @@ export default async function NewAppPage({
           Create app
         </button>
         <p className="field-hint">
-          No password field on purpose: workflow inputs are visible in the public run log. Set the
-          sign-in afterwards with <code>pnpm hash-password</code>.
+          No password field on purpose: workflow inputs are visible in the public run log. The new
+          app gets your standing operator password, so you can sign in as soon as it is live.
         </p>
       </form>
 
