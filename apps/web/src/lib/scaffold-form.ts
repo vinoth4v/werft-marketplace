@@ -9,7 +9,17 @@ import { z } from "zod"
  */
 const NAME_PATTERN = /^[a-z][a-z0-9-]{0,38}[a-z0-9]$/
 
-export const THEME_KEYS = ["werft", "madras", "deck", "nordlicht", "tinte"] as const
+export const THEME_KEYS = [
+  "werft",
+  "madras",
+  "deck",
+  "nordlicht",
+  "tinte",
+  "kimi-earth",
+  "kimi-cocoa",
+  "kimi-editorial",
+  "kimi-terminal",
+] as const
 export const REGION_KEYS = ["us-east", "eu-central", "us-west"] as const
 
 export const scaffoldFormSchema = z.object({

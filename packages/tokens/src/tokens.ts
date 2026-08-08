@@ -35,8 +35,9 @@ export const color = {
   border: { light: scale.zinc200, dark: scale.zinc800 },
   accent: { light: scale.blue600, dark: scale.blue400 },
   danger: { light: scale.red600, dark: scale.red400 },
-  // For the registry's health dots: a third state (healthy) needing its own
-  // colour, not a reuse of accent or danger, which already mean something else.
+  // A third state distinct from accent and danger — health dots, "saved"
+  // banners. The marketplace grew this token first; the template carries it
+  // now so every theme and every scaffolded app has it from the start.
   success: { light: scale.green600, dark: scale.green400 },
 } as const
 
