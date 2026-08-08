@@ -1,20 +1,9 @@
 {
   "name": "werft-marketplace",
   "description": "Personal app registry and dashboard.",
-  "stack": [
-    "next",
-    "typescript",
-    "neon",
-    "drizzle",
-    "next-auth",
-    "vercel"
-  ],
+  "stack": ["next", "typescript", "neon", "drizzle", "next-auth", "vercel"],
   "url": "https://werft-marketplace.vercel.app",
-  "tags": [
-    "marketplace",
-    "registry",
-    "personal"
-  ],
+  "tags": ["marketplace", "registry", "personal"],
   "status": "prototype",
   "private": false
 }
