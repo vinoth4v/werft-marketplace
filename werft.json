@@ -1,0 +1,20 @@
+{
+  "name": "werft-marketplace",
+  "description": "Personal app registry and dashboard.",
+  "stack": [
+    "next",
+    "typescript",
+    "neon",
+    "drizzle",
+    "next-auth",
+    "vercel"
+  ],
+  "url": "",
+  "tags": [
+    "marketplace",
+    "registry",
+    "personal"
+  ],
+  "status": "prototype",
+  "private": false
+}
