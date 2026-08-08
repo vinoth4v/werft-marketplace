@@ -10,6 +10,9 @@ const valid = {
   status: "prototype",
   deploy: true,
   vercel_sso: false,
+  region: "",
+  with_s3: false,
+  theme: "werft",
   first_task: "",
 }
 
@@ -50,10 +53,22 @@ describe("toDispatchInputs", () => {
       "description",
       "email",
       "first_task",
+      "region",
       "status",
       "tags",
+      "theme",
       "vercel_sso",
       "visibility",
+      "with_s3",
     ])
+  })
+
+  it("carries the theme and region choices through verbatim", () => {
+    const inputs = toDispatchInputs(
+      scaffoldFormSchema.parse({ ...valid, theme: "madras", region: "eu-central", with_s3: true }),
+    )
+    expect(inputs.theme).toBe("madras")
+    expect(inputs.region).toBe("eu-central")
+    expect(inputs.with_s3).toBe("true")
   })
 })

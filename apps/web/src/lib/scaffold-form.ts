@@ -9,6 +9,9 @@ import { z } from "zod"
  */
 const NAME_PATTERN = /^[a-z][a-z0-9-]{0,38}[a-z0-9]$/
 
+export const THEME_KEYS = ["werft", "madras", "deck", "nordlicht", "tinte"] as const
+export const REGION_KEYS = ["us-east", "eu-central", "us-west"] as const
+
 export const scaffoldFormSchema = z.object({
   app_name: z.string().regex(NAME_PATTERN, {
     message: "lowercase letters, digits and hyphens; 2–40 characters; no leading/trailing hyphen",
@@ -20,6 +23,11 @@ export const scaffoldFormSchema = z.object({
   status: z.enum(["prototype", "active", "paused", "archived"]),
   deploy: z.boolean(),
   vercel_sso: z.boolean(),
+  // "" means each provider's own default — the workflow's region input allows
+  // it too, so an unregioned app behaves exactly as before.
+  region: z.enum(["", ...REGION_KEYS]),
+  with_s3: z.boolean(),
+  theme: z.enum(THEME_KEYS),
   first_task: z.string().trim().max(2000).default(""),
 })
 
@@ -40,6 +48,9 @@ export function toDispatchInputs(form: ScaffoldForm): Record<string, string> {
     status: form.status,
     deploy: String(form.deploy),
     vercel_sso: String(form.vercel_sso),
+    region: form.region,
+    with_s3: String(form.with_s3),
+    theme: form.theme,
     first_task: form.first_task,
   }
 }
