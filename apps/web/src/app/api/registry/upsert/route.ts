@@ -36,6 +36,10 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   const app = parsed.data
+  // CI omits lastDeployAt, and for CI "now" is correct — a merge to main
+  // deploys. A metadata-only correction sends the app's real date instead, so
+  // editing a description cannot fabricate a deploy that never happened.
+  const deployedAt = app.lastDeployAt ? new Date(app.lastDeployAt) : new Date()
   const [row] = await db()
     .insert(werftApp)
     .values({
@@ -47,7 +51,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       status: app.status,
       private: app.private,
       repoUrl: repoUrlFor(app.name),
-      lastDeployAt: new Date(),
+      lastDeployAt: deployedAt,
       updatedAt: new Date(),
     })
     .onConflictDoUpdate({
@@ -60,7 +64,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         status: app.status,
         private: app.private,
         repoUrl: repoUrlFor(app.name),
-        lastDeployAt: new Date(),
+        lastDeployAt: deployedAt,
         updatedAt: new Date(),
       },
     })

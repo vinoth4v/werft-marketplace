@@ -113,7 +113,7 @@ export default async function AppDetailPage({ params }: { params: Promise<{ name
         </div>
         {app.tags.length > 0 && (
           <div>
-            <dt>Tags</dt>
+            <dt>Categories</dt>
             <dd>
               <div className="badges">
                 {app.tags.map((tag) => (

@@ -19,6 +19,18 @@ export const werftAppPayloadSchema = z.object({
   tags: z.array(z.string().min(1)),
   status: z.enum(APP_STATUSES),
   private: z.boolean(),
+  /**
+   * When this app actually last deployed. Omitted by CI — a merge to main
+   * deploys, so "now" is the truth there, and every werft.json stays free of
+   * a field no app should have to maintain.
+   *
+   * It exists for the other writer: correcting the metadata of a pre-Werft
+   * app that has no CI of its own. Without it, fixing a typo in a
+   * description would stamp today over a real deploy date, and the wall —
+   * which sorts by this — would reorder itself around an edit that deployed
+   * nothing.
+   */
+  lastDeployAt: z.iso.datetime().optional(),
 })
 
 export type WerftAppPayload = z.infer<typeof werftAppPayloadSchema>

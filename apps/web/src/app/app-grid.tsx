@@ -76,7 +76,7 @@ export function AppGrid({ apps, tags }: Props) {
 
       {tags.length > 0 && (
         <fieldset className="tag-filters">
-          <legend className="sr-only">Filter by tag</legend>
+          <legend className="sr-only">Filter by category</legend>
           <button
             type="button"
             className={activeTag === null ? "tag-filter active" : "tag-filter"}
@@ -99,7 +99,7 @@ export function AppGrid({ apps, tags }: Props) {
 
       {filtered.length === 0 ? (
         <div className="empty-state">
-          <p>Nothing matches. Try a different search or clear the tag filter.</p>
+          <p>Nothing matches. Try a different search, or show all categories.</p>
           <button
             type="button"
             onClick={() => {
@@ -132,10 +132,12 @@ function AppCard({ app }: { app: WerftAppRow }) {
           </span>
         </div>
         <p className="app-card-description">{app.description}</p>
+        {/* What it is, not what it is built with. The tech stack is still on
+            the app's own page, where someone asking that question goes. */}
         <div className="badges">
-          {app.stack.map((tech) => (
-            <span key={tech} className="badge">
-              {tech}
+          {app.tags.map((tag) => (
+            <span key={tag} className="badge">
+              {tag}
             </span>
           ))}
         </div>
