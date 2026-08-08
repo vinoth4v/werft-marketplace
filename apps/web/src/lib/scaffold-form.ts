@@ -41,7 +41,10 @@ export const scaffoldFormSchema = z.object({
   region: z.enum(["", ...REGION_KEYS]),
   with_s3: z.boolean(),
   theme: z.enum(THEME_KEYS),
-  first_task: z.string().trim().max(2000).default(""),
+  // A plan, not a one-liner: it becomes the body of the @claude issue that
+  // builds the app. 20k characters is well inside what a dispatch input and an
+  // issue body both accept, and far past what a plan needs.
+  build_plan: z.string().trim().max(20_000).default(""),
 })
 
 export type ScaffoldForm = z.infer<typeof scaffoldFormSchema>
@@ -65,6 +68,6 @@ export function toDispatchInputs(form: ScaffoldForm): Record<string, string> {
     region: form.region,
     with_s3: String(form.with_s3),
     theme: form.theme,
-    first_task: form.first_task,
+    build_plan: form.build_plan,
   }
 }

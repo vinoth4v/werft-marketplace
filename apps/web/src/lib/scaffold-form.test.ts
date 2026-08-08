@@ -14,7 +14,7 @@ const valid = {
   region: "",
   with_s3: false,
   theme: "werft",
-  first_task: "",
+  build_plan: "",
 }
 
 describe("scaffoldFormSchema", () => {
@@ -33,7 +33,7 @@ describe("scaffoldFormSchema", () => {
   })
 
   it("caps the first task, since it becomes an issue body", () => {
-    expect(scaffoldFormSchema.safeParse({ ...valid, first_task: "x".repeat(2001) }).success).toBe(
+    expect(scaffoldFormSchema.safeParse({ ...valid, build_plan: "x".repeat(20_001) }).success).toBe(
       false,
     )
   })
@@ -50,10 +50,10 @@ describe("toDispatchInputs", () => {
     const inputs = toDispatchInputs(scaffoldFormSchema.parse(valid))
     expect(Object.keys(inputs).sort()).toEqual([
       "app_name",
+      "build_plan",
       "deploy",
       "description",
       "email",
-      "first_task",
       "region",
       "status",
       "tags",
@@ -79,5 +79,15 @@ describe("toDispatchInputs", () => {
       "My App",
     )
     expect(toDispatchInputs(scaffoldFormSchema.parse(valid)).title).toBe("")
+  })
+
+  it("accepts a plan long enough to be a real plan", () => {
+    // The old 2,000-character cap was the actual limit on how much you could
+    // tell Claude before it started building.
+    const plan = "## Screens\n\n- one\n- two\n".repeat(300)
+    expect(plan.length).toBeGreaterThan(2_000)
+    const parsed = scaffoldFormSchema.safeParse({ ...valid, build_plan: plan })
+    expect(parsed.success).toBe(true)
+    expect(parsed.success && toDispatchInputs(parsed.data).build_plan).toContain("## Screens")
   })
 })

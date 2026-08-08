@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { CopyButton } from "@/app/copy-button"
 import { scaffoldAction } from "./actions.ts"
+import { BuildPlanField } from "./build-plan-field.tsx"
 import { ThemePicker } from "./theme-picker.tsx"
 
 export const metadata: Metadata = {
@@ -161,20 +162,7 @@ export default async function NewAppPage({
           </label>
         </div>
 
-        <div className="form-field">
-          <label htmlFor="first_task">First task for Claude (optional)</label>
-          <textarea
-            id="first_task"
-            name="first_task"
-            rows={4}
-            maxLength={2000}
-            placeholder="Describe the first thing to build — e.g. 'Replace the placeholder home page with a weekly meal-planning board backed by the database.'"
-          />
-          <p className="field-hint">
-            Filed as an <code>@claude</code> issue in the new repo the moment it exists — Claude
-            Code starts building it headlessly and pushes a branch for your review.
-          </p>
-        </div>
+        <BuildPlanField name="build_plan" />
 
         <button type="submit" className="launch-button form-submit">
           Create app
