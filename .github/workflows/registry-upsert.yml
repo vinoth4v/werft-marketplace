@@ -1,0 +1,47 @@
+name: Registry upsert
+
+# On merge to main, post this app's own werft.json to the Werft registry.
+# Populated by CI only — see AGENTS.md.
+#
+# Yes, this app posts to its own endpoint. The registry demands that every
+# app register itself this way, and this app was the one exception: it had no
+# such workflow, so its own row sat frozen at whatever was first inserted and
+# drifted from its werft.json the moment that file changed. Ordinary HTTP with
+# the shared bearer token, exactly like any other app — no special path, no
+# direct database write from a build step.
+#
+# Skips gracefully rather than failing the build when WERFT_REGISTRY_TOKEN
+# isn't configured.
+on:
+  push:
+    branches: [main]
+
+jobs:
+  upsert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Upsert into the Werft registry
+        env:
+          WERFT_REGISTRY_TOKEN: ${{ secrets.WERFT_REGISTRY_TOKEN }}
+        run: |
+          if [ -z "$WERFT_REGISTRY_TOKEN" ]; then
+            echo "WERFT_REGISTRY_TOKEN not set — skipping registry upsert"
+            exit 0
+          fi
+          if [ ! -f werft.json ]; then
+            echo "no werft.json in this repo — skipping registry upsert"
+            exit 0
+          fi
+
+          status=$(curl -sS -o /tmp/registry-response.json -w '%{http_code}' \
+            -X POST https://werft-marketplace.vercel.app/api/registry/upsert \
+            -H "Authorization: Bearer $WERFT_REGISTRY_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data-binary @werft.json)
+
+          cat /tmp/registry-response.json
+          if [ "$status" -ge 300 ]; then
+            echo "registry upsert failed with HTTP $status"
+            exit 1
+          fi
