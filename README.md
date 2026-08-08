@@ -12,3 +12,4 @@ pnpm dev
 Environment lives in `apps/web/.env.local`; `apps/web/.env.example` lists what
 is needed. Run `pnpm hash-password` to set the operator password.
 <!-- wiring verification -->
+Live at https://werft-marketplace.vercel.app — open /new in the app to scaffold more apps.
