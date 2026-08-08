@@ -36,6 +36,7 @@ export async function scaffoldAction(formData: FormData): Promise<void> {
     with_s3: formData.get("with_s3") === "on",
     vercel_sso: formData.get("vercel_sso") === "on",
     build_plan: String(formData.get("build_plan") ?? ""),
+    model: String(formData.get("model") ?? ""),
   })
 
   if (!parsed.success) {

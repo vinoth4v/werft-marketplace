@@ -52,6 +52,7 @@ export async function requestFeatureAction(formData: FormData): Promise<void> {
   const app = String(formData.get("app_name") ?? "")
   const request = String(formData.get("request") ?? "").trim()
   const title = String(formData.get("title") ?? "").trim()
+  const model = String(formData.get("model") ?? "").trim()
 
   if (request === "") {
     redirect(`/apps/${app}?error=${encodeURIComponent("describe the change first")}`)
@@ -60,7 +61,15 @@ export async function requestFeatureAction(formData: FormData): Promise<void> {
     redirect(`/apps/${app}?error=${encodeURIComponent("that is longer than 20,000 characters")}`)
   }
 
-  const result = await dispatch("request-feature.yml", { app_name: app, request, title })
+  // Validated here as well as in the workflow: this ends up as a command-line
+  // argument, and a form field is not a trustworthy source for one.
+  const chosen = ["opus", "sonnet", "haiku"].includes(model) ? model : ""
+  const result = await dispatch("request-feature.yml", {
+    app_name: app,
+    request,
+    title,
+    model: chosen,
+  })
   redirect(
     result.ok
       ? `/apps/${app}?requested=1`
