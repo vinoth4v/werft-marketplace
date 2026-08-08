@@ -16,6 +16,9 @@ export const scaffoldFormSchema = z.object({
   app_name: z.string().regex(NAME_PATTERN, {
     message: "lowercase letters, digits and hyphens; 2–40 characters; no leading/trailing hyphen",
   }),
+  // Display name. Blank means "use the app name", which the registry already
+  // falls back to, so it stays optional all the way down.
+  title: z.string().trim().max(60).default(""),
   description: z.string().trim().min(1, { message: "the registry card needs one line" }),
   email: z.email(),
   tags: z.string().trim().default(""),
@@ -41,6 +44,7 @@ export type ScaffoldForm = z.infer<typeof scaffoldFormSchema>
 export function toDispatchInputs(form: ScaffoldForm): Record<string, string> {
   return {
     app_name: form.app_name,
+    title: form.title,
     description: form.description,
     email: form.email,
     tags: form.tags,

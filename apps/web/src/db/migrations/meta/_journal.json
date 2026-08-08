@@ -15,6 +15,13 @@
       "when": 1786193670082,
       "tag": "0001_werft_app",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786210580763,
+      "tag": "0002_app_title",
+      "breakpoints": true
     }
   ]
 }

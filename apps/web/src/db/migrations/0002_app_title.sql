@@ -1,0 +1,1 @@
+ALTER TABLE "werft_app" ADD COLUMN "title" text;

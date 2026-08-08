@@ -12,7 +12,8 @@ export async function generateMetadata({
   params: Promise<{ name: string }>
 }): Promise<Metadata> {
   const { name } = await params
-  return { title: name }
+  const app = await getAppByName(name)
+  return { title: app?.title ?? name }
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -46,11 +47,13 @@ export default async function AppDetailPage({ params }: { params: Promise<{ name
       </Link>
 
       <div className="detail-header">
-        <h1>{app.name}</h1>
+        <h1>{app.title ?? app.name}</h1>
         <span className={`health-dot health-${app.health}`} title={healthLabel(app.health)}>
           <span className="sr-only">{healthLabel(app.health)}</span>
         </span>
       </div>
+
+      {app.title && <p className="slug">{app.name}</p>}
 
       <p className="subtitle">{app.description}</p>
 

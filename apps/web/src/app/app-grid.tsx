@@ -36,6 +36,7 @@ export function AppGrid({ apps, tags }: Props) {
       const matchesQuery =
         needle === "" ||
         app.name.toLowerCase().includes(needle) ||
+        (app.title ?? "").toLowerCase().includes(needle) ||
         app.description.toLowerCase().includes(needle)
       const matchesTag = activeTag === null || app.tags.includes(activeTag)
       return matchesQuery && matchesTag
@@ -126,7 +127,7 @@ function AppCard({ app }: { app: WerftAppRow }) {
     <article className="app-card">
       <Link href={`/apps/${app.name}`} className="app-card-link">
         <div className="app-card-header">
-          <h2>{app.name}</h2>
+          <h2>{app.title ?? app.name}</h2>
           <span className={`health-dot health-${app.health}`} title={healthLabel(app.health)}>
             <span className="sr-only">{healthLabel(app.health)}</span>
           </span>
