@@ -39,6 +39,30 @@ test("the registry API is not gated by the session", async ({ request }) => {
   expect(response.status()).toBe(401)
 })
 
+test("the new-app instructions page is gated like everything else", async ({ page }) => {
+  // /new is operator documentation with the operator's own paths in it —
+  // closed by default is the template's whole posture, and a new route is
+  // protected because it exists.
+  await page.goto("/new")
+  await expect(page).toHaveURL(/\/login/)
+})
+
+test("the favicon is served without a session", async ({ request }) => {
+  // app/icon.svg is served at /icon.svg, which the gate's matcher must
+  // exempt — otherwise every signed-out tab shows a broken icon.
+  const response = await request.get("/icon.svg", { maxRedirects: 0 })
+
+  expect(response.status()).toBe(200)
+  expect(response.headers()["content-type"]).toContain("svg")
+})
+
+test("registry removal rejects an unauthenticated request", async ({ request }) => {
+  const response = await request.delete("/api/registry/apps/anything", { maxRedirects: 0 })
+
+  expect(response.status()).not.toBe(307)
+  expect(response.status()).toBe(401)
+})
+
 test("the health-check cron rejects an unauthenticated request", async ({ request }) => {
   // Fails closed: an absent or wrong Authorization header is always 401,
   // whether or not CRON_SECRET happens to be configured in this environment.

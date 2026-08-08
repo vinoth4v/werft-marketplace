@@ -15,5 +15,5 @@ export default NextAuth(authConfig).auth
  * every other app's CI — which has no session — has to be able to reach it.
  */
 export const config = {
-  matcher: ["/((?!api/auth|api/registry|login|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api/auth|api/registry|login|_next/static|_next/image|favicon.ico|icon.svg).*)"],
 }
