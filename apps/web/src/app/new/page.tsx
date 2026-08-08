@@ -80,6 +80,15 @@ export default async function NewAppPage({
         </div>
 
         <div className="form-field">
+          <label htmlFor="title">Display name</label>
+          <input id="title" name="title" maxLength={60} placeholder="My App" />
+          <p className="field-hint">
+            Optional. How it's shown on this page — capitals and spaces allowed, unlike the name
+            above. Leave blank to just use the name.
+          </p>
+        </div>
+
+        <div className="form-field">
           <label htmlFor="description">Description</label>
           <input
             id="description"

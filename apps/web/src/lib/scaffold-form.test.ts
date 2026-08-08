@@ -3,6 +3,7 @@ import { scaffoldFormSchema, toDispatchInputs } from "./scaffold-form.ts"
 
 const valid = {
   app_name: "my-app",
+  title: "",
   description: "Does a thing.",
   email: "op@example.com",
   tags: "personal",
@@ -57,6 +58,7 @@ describe("toDispatchInputs", () => {
       "status",
       "tags",
       "theme",
+      "title",
       "vercel_sso",
       "visibility",
       "with_s3",
@@ -70,5 +72,12 @@ describe("toDispatchInputs", () => {
     expect(inputs.theme).toBe("madras")
     expect(inputs.region).toBe("eu-central")
     expect(inputs.with_s3).toBe("true")
+  })
+
+  it("carries the display name through, and blank means use the slug", () => {
+    expect(toDispatchInputs(scaffoldFormSchema.parse({ ...valid, title: "My App" })).title).toBe(
+      "My App",
+    )
+    expect(toDispatchInputs(scaffoldFormSchema.parse(valid)).title).toBe("")
   })
 })

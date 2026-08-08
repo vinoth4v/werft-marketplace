@@ -23,6 +23,7 @@ export async function scaffoldAction(formData: FormData): Promise<void> {
 
   const parsed = scaffoldFormSchema.safeParse({
     app_name: String(formData.get("app_name") ?? ""),
+    title: String(formData.get("title") ?? ""),
     description: String(formData.get("description") ?? ""),
     email: String(formData.get("email") ?? ""),
     tags: String(formData.get("tags") ?? ""),

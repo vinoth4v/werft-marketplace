@@ -36,6 +36,28 @@ describe("werftAppPayloadSchema", () => {
     expect(werftAppPayloadSchema.safeParse({ ...valid, status: "live" }).success).toBe(false)
   })
 
+  it("treats title as optional, so an app with no branding shows its slug", () => {
+    expect(werftAppPayloadSchema.safeParse(valid).success).toBe(true)
+    expect("title" in valid).toBe(false)
+  })
+
+  it("accepts a display title that the slug rules would reject", () => {
+    // The whole point: `name` must be a repo, database and subdomain, so it
+    // can never be "SruthiScribe Learn". The title can.
+    const parsed = werftAppPayloadSchema.safeParse({ ...valid, title: "SruthiScribe Learn" })
+    expect(parsed.success).toBe(true)
+    expect(parsed.success && parsed.data.title).toBe("SruthiScribe Learn")
+  })
+
+  it("rejects a blank or whitespace-only title rather than storing an empty heading", () => {
+    for (const bad of ["", "   ", "\n"]) {
+      expect(
+        werftAppPayloadSchema.safeParse({ ...valid, title: bad }).success,
+        JSON.stringify(bad),
+      ).toBe(false)
+    }
+  })
+
   it("treats lastDeployAt as optional, so every werft.json stays free of it", () => {
     expect(werftAppPayloadSchema.safeParse(valid).success).toBe(true)
     expect("lastDeployAt" in valid).toBe(false)

@@ -44,6 +44,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     .insert(werftApp)
     .values({
       name: app.name,
+      title: app.title ?? null,
       description: app.description,
       stack: app.stack,
       url: app.url,
@@ -57,6 +58,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     .onConflictDoUpdate({
       target: werftApp.name,
       set: {
+        title: app.title ?? null,
         description: app.description,
         stack: app.stack,
         url: app.url,
