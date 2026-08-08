@@ -38,3 +38,12 @@ test("the registry API is not gated by the session", async ({ request }) => {
   // by redirecting to a login page it was never supposed to reach.
   expect(response.status()).toBe(401)
 })
+
+test("the health-check cron rejects an unauthenticated request", async ({ request }) => {
+  // Fails closed: an absent or wrong Authorization header is always 401,
+  // whether or not CRON_SECRET happens to be configured in this environment.
+  const response = await request.get("/api/registry/health-check", { maxRedirects: 0 })
+
+  expect(response.status()).not.toBe(307)
+  expect(response.status()).toBe(401)
+})

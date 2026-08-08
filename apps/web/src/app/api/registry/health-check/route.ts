@@ -11,10 +11,16 @@ const PER_APP_TIMEOUT_MS = 8000
  * Nightly, via vercel.json's crons entry. Vercel signs cron requests with
  * CRON_SECRET automatically — this route only has to check for it, never
  * generate or store it itself.
+ *
+ * Fails closed: a missing CRON_SECRET rejects the request rather than
+ * skipping the check. This matches Vercel's own documented pattern —
+ * `!cronSecret || header !== ...` — the opposite of what shipped first,
+ * which treated an unconfigured secret as "no check needed" and left this
+ * open to the internet until it was tested against the real deployment.
  */
 export async function GET(request: Request): Promise<NextResponse> {
   const secret = process.env.CRON_SECRET
-  if (secret && request.headers.get("authorization") !== `Bearer ${secret}`) {
+  if (!secret || request.headers.get("authorization") !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 })
   }
 
