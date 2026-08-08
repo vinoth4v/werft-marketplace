@@ -43,6 +43,7 @@ export default defineConfig({
           DATABASE_URL: "postgresql://smoke:smoke@127.0.0.1:1/smoke",
           WERFT_USER_EMAIL: "smoke@example.test",
           WERFT_PASSWORD_HASH: "scrypt$65536$8$1$00$00",
+          WERFT_REGISTRY_TOKEN: "smoke-test-registry-token",
         },
       },
 })
