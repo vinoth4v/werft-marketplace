@@ -1,4 +1,9 @@
+import type { Metadata } from "next"
 import { signInAction } from "./actions.ts"
+
+export const metadata: Metadata = {
+  title: "Sign in",
+}
 
 export const dynamic = "force-dynamic"
 
@@ -12,6 +17,9 @@ export default async function LoginPage({
   return (
     <main>
       <h1>Sign in</h1>
+      <p className="subtitle">
+        Single-operator app: only the one email set at scaffold time can get in.
+      </p>
 
       {error ? (
         // Never say which half was wrong.
@@ -37,6 +45,12 @@ export default async function LoginPage({
         </p>
         <button type="submit">Sign in</button>
       </form>
+
+      <p className="field-hint login-hint">
+        Forgot the password? There is no reset flow, on purpose — generate a new hash with{" "}
+        <code>pnpm hash-password</code> in the app's repo and update{" "}
+        <code>WERFT_PASSWORD_HASH</code> on Vercel.
+      </p>
     </main>
   )
 }

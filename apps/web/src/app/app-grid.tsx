@@ -15,6 +15,12 @@ const HEALTH_LABEL: Record<string, string> = {
   unknown: "Not checked yet",
 }
 
+/** A health value this UI has never heard of must degrade to words, not to
+ * an unlabeled dot with an undefined tooltip. */
+function healthLabel(health: string): string {
+  return HEALTH_LABEL[health] ?? `Unrecognised state: ${health}`
+}
+
 /**
  * Everything below is client-side filtering over data already fetched on the
  * server. A single operator's own apps is a small, known list — there is no
@@ -39,11 +45,16 @@ export function AppGrid({ apps, tags }: Props) {
   if (apps.length === 0) {
     return (
       <div className="empty-state">
-        <p>You haven't shipped anything yet.</p>
         <p>
-          Run <code>pnpm create-app</code> in werft-template to scaffold your first app — it shows
-          up here automatically the first time it merges to main.
+          <strong>You haven't shipped anything yet.</strong>
         </p>
+        <p>
+          One command scaffolds a deployed, authenticated app that registers itself here on its
+          first merge — nothing to add manually.
+        </p>
+        <Link href="/new" className="launch-button">
+          Scaffold your first app
+        </Link>
       </div>
     )
   }
@@ -116,7 +127,9 @@ function AppCard({ app }: { app: WerftAppRow }) {
       <Link href={`/apps/${app.name}`} className="app-card-link">
         <div className="app-card-header">
           <h2>{app.name}</h2>
-          <span className={`health-dot health-${app.health}`} title={HEALTH_LABEL[app.health]} />
+          <span className={`health-dot health-${app.health}`} title={healthLabel(app.health)}>
+            <span className="sr-only">{healthLabel(app.health)}</span>
+          </span>
         </div>
         <p className="app-card-description">{app.description}</p>
         <div className="badges">
@@ -132,7 +145,9 @@ function AppCard({ app }: { app: WerftAppRow }) {
           Launch ↗
         </a>
       ) : (
-        <span className="launch-button launch-button-disabled">Not deployed yet</span>
+        <span className="launch-button launch-button-disabled" title="No production URL recorded">
+          Not deployed yet
+        </span>
       )}
     </article>
   )

@@ -142,10 +142,10 @@ have its own Neon and Vercel projects — it's the one app in Werft that every
 other app's CI talks to.
 
 - Holds the `werft_app` table: one row per app scaffolded from
-  werft-template, written only by `POST /api/registry/upsert`
-  (`WERFT_REGISTRY_TOKEN` bearer auth) — never by hand, never by any other
-  path. A row that drifts from its app's own `werft.json` is a bug in the
-  upsert path.
+  werft-template, written only by `POST /api/registry/upsert` and removed
+  only by `DELETE /api/registry/apps/<name>` (both `WERFT_REGISTRY_TOKEN`
+  bearer auth) — never by hand, never by any other path. A row that drifts
+  from its app's own `werft.json` is a bug in the upsert path.
 - `GET /api/registry/health-check` runs nightly (`vercel.json`'s `crons`),
   pings every registered app's URL, and records health. Fails closed:
   requires `CRON_SECRET` and rejects a missing or wrong one, never treats an
