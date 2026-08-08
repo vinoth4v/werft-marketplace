@@ -1,10 +1,13 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { CopyButton } from "@/app/copy-button"
+import { scaffoldAction } from "./actions.ts"
 
 export const metadata: Metadata = {
   title: "New app",
 }
+
+export const dynamic = "force-dynamic"
 
 const SCAFFOLD_COMMAND = `export NEON_API_KEY="$(cat ~/.config/werft/neon-key)"
 cd ~/Documents/workspace/werft-template
@@ -18,51 +21,147 @@ pnpm create-app \\
   --public \\
   --yes`
 
-export default function NewAppPage() {
+export default async function NewAppPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ dispatched?: string; error?: string }>
+}) {
+  const { dispatched, error } = await searchParams
+
   return (
-    <main>
+    <main className="wide">
       <Link href="/" className="back-link">
         ← All apps
       </Link>
 
-      <h1>Scaffold a new app</h1>
+      <h1>Create a new app</h1>
       <p className="subtitle">
-        One command gives you a deployed, authenticated app with its own database, CI gates, and
-        preview pipeline — and it appears on this page by itself.
+        Fill this in and a deployed, authenticated app with its own database, CI gates and preview
+        pipeline builds itself — then appears on this page on its own.
       </p>
 
-      <ol className="steps">
-        <li>
-          <h2>Run the scaffold</h2>
-          <p>
-            From your machine, with the <code>gh</code> and <code>vercel</code> CLIs signed in.
-            Change <code>--name</code>, the description, email and password; the name becomes the
-            GitHub repo, the database, the Vercel project and the URL.
+      {dispatched && (
+        <div className="banner banner-ok" role="status">
+          <strong>{dispatched}</strong> is being built.{" "}
+          <a
+            href="https://github.com/vinoth4v/werft-template/actions/workflows/scaffold-app.yml"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Watch the run ↗
+          </a>{" "}
+          — it takes about two minutes, then the app's card appears on{" "}
+          <Link href="/">the home page</Link>. Sign-in isn't configured yet: run{" "}
+          <code>pnpm hash-password</code> in the new repo when you're ready.
+        </div>
+      )}
+      {error && (
+        <div className="banner banner-error" role="alert">
+          That didn't dispatch: {error}
+        </div>
+      )}
+
+      <form action={scaffoldAction} className="scaffold-form">
+        <div className="form-field">
+          <label htmlFor="app_name">Name</label>
+          <input
+            id="app_name"
+            name="app_name"
+            required
+            pattern="[a-z][a-z0-9-]{0,38}[a-z0-9]"
+            placeholder="my-app"
+            title="Lowercase letters, digits and hyphens; 2–40 characters"
+          />
+          <p className="field-hint">
+            Becomes the GitHub repo, the database, the Vercel project and the URL (name.vercel.app)
+            — choose like it's permanent.
           </p>
-          <div className="command-block">
-            <pre>{SCAFFOLD_COMMAND}</pre>
-            <CopyButton text={SCAFFOLD_COMMAND} />
+        </div>
+
+        <div className="form-field">
+          <label htmlFor="description">Description</label>
+          <input
+            id="description"
+            name="description"
+            required
+            placeholder="One line for the card on this page."
+          />
+        </div>
+
+        <div className="form-field">
+          <label htmlFor="email">Operator email</label>
+          <input id="email" name="email" type="email" required placeholder="you@example.com" />
+          <p className="field-hint">The only address that will be able to sign in to the app.</p>
+        </div>
+
+        <div className="form-field">
+          <label htmlFor="tags">Tags</label>
+          <input id="tags" name="tags" placeholder="personal, tools (comma-separated, optional)" />
+        </div>
+
+        <div className="form-row">
+          <div className="form-field">
+            <label htmlFor="visibility">Repository</label>
+            <select id="visibility" name="visibility" defaultValue="public">
+              <option value="public">Public — required checks enforced for free</option>
+              <option value="private">Private — checks advisory on the Free plan</option>
+            </select>
           </div>
-        </li>
-        <li>
-          <h2>Wait about two minutes</h2>
-          <p>
-            The scaffold builds the app locally first, so the common failure costs nothing to clean
-            up — then creates the repo, database and hosting, deploys, sets the CI secrets, and
-            protects <code>main</code>. If anything fails midway, it removes what it created or
-            prints the exact cleanup command for whatever it could not.
+          <div className="form-field">
+            <label htmlFor="status">Status</label>
+            <select id="status" name="status" defaultValue="prototype">
+              <option value="prototype">Prototype</option>
+              <option value="active">Active</option>
+              <option value="paused">Paused</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="form-checks">
+          <label className="check">
+            <input type="checkbox" name="deploy" defaultChecked /> Deploy to production at the end
+          </label>
+          <label className="check">
+            <input type="checkbox" name="vercel_sso" /> Put Vercel SSO in front of the whole
+            deployment <span className="field-hint">(breaks preview URLs — rarely wanted)</span>
+          </label>
+        </div>
+
+        <div className="form-field">
+          <label htmlFor="first_task">First task for Claude (optional)</label>
+          <textarea
+            id="first_task"
+            name="first_task"
+            rows={4}
+            maxLength={2000}
+            placeholder="Describe the first thing to build — e.g. 'Replace the placeholder home page with a weekly meal-planning board backed by the database.'"
+          />
+          <p className="field-hint">
+            Filed as an <code>@claude</code> issue in the new repo the moment it exists — Claude
+            Code starts building it headlessly and pushes a branch for your review.
           </p>
-        </li>
-        <li>
-          <h2>There is no step three</h2>
-          <p>
-            The app registers itself on this page during the scaffold's own final push, and every
-            merge to <code>main</code> after that updates its card. Health is checked nightly. Open
-            a PR in the new repo and four gates run automatically against a real preview deployment
-            on its own database branch.
-          </p>
-        </li>
-      </ol>
+        </div>
+
+        <button type="submit" className="launch-button form-submit">
+          Create app
+        </button>
+        <p className="field-hint">
+          No password field on purpose: workflow inputs are visible in the public run log. Set the
+          sign-in afterwards with <code>pnpm hash-password</code>.
+        </p>
+      </form>
+
+      <details className="cli-details">
+        <summary>Prefer the terminal?</summary>
+        <p className="field-hint">
+          Same scaffold, run locally — and the only way to set the password in the same step:
+        </p>
+        <div className="command-block">
+          <pre>{SCAFFOLD_COMMAND}</pre>
+          <CopyButton text={SCAFFOLD_COMMAND} />
+        </div>
+      </details>
 
       <section className="help-box">
         <h2>Working on an app after that</h2>

@@ -1,0 +1,45 @@
+import { z } from "zod"
+
+/**
+ * The /new form's contract with werft-template's scaffold-app.yml dispatch.
+ *
+ * Same name rule as werft.json enforces — the name becomes a repo, a Neon
+ * project, a Vercel project and a subdomain, so rejecting it here beats a
+ * runner failing three resources in.
+ */
+const NAME_PATTERN = /^[a-z][a-z0-9-]{0,38}[a-z0-9]$/
+
+export const scaffoldFormSchema = z.object({
+  app_name: z.string().regex(NAME_PATTERN, {
+    message: "lowercase letters, digits and hyphens; 2–40 characters; no leading/trailing hyphen",
+  }),
+  description: z.string().trim().min(1, { message: "the registry card needs one line" }),
+  email: z.email(),
+  tags: z.string().trim().default(""),
+  visibility: z.enum(["public", "private"]),
+  status: z.enum(["prototype", "active", "paused", "archived"]),
+  deploy: z.boolean(),
+  vercel_sso: z.boolean(),
+  first_task: z.string().trim().max(2000).default(""),
+})
+
+export type ScaffoldForm = z.infer<typeof scaffoldFormSchema>
+
+/**
+ * GitHub's dispatch API takes every input as a string, whatever type the
+ * workflow declares — booleans included. The YAML side compares against
+ * "true"/"false" accordingly.
+ */
+export function toDispatchInputs(form: ScaffoldForm): Record<string, string> {
+  return {
+    app_name: form.app_name,
+    description: form.description,
+    email: form.email,
+    tags: form.tags,
+    visibility: form.visibility,
+    status: form.status,
+    deploy: String(form.deploy),
+    vercel_sso: String(form.vercel_sso),
+    first_task: form.first_task,
+  }
+}
