@@ -134,3 +134,34 @@ required set here was narrowed to `gitleaks`, `typecheck`, `build`.
 
 Describe capabilities, not paths. File paths in agent context go stale and
 mislead; find the code by reading it.
+
+## This app specifically: the Werft registry and marketplace
+
+Unlike the generic template text above, this repo *is* deployed and *does*
+have its own Neon and Vercel projects — it's the one app in Werft that every
+other app's CI talks to.
+
+- Holds the `werft_app` table: one row per app scaffolded from
+  werft-template, written only by `POST /api/registry/upsert`
+  (`WERFT_REGISTRY_TOKEN` bearer auth) — never by hand, never by any other
+  path. A row that drifts from its app's own `werft.json` is a bug in the
+  upsert path.
+- `GET /api/registry/health-check` runs nightly (`vercel.json`'s `crons`),
+  pings every registered app's URL, and records health. Fails closed:
+  requires `CRON_SECRET` and rejects a missing or wrong one, never treats an
+  absent secret as "no check needed."
+- **`/api/registry/*` is deliberately exempt from the session gate** — see
+  `proxy.ts`'s matcher. Every app's CI, and Vercel's own cron trigger, call
+  these with no session cookie. If you add another API route that needs to
+  be reachable without a signed-in session, it needs the same exemption, or
+  it will silently 307 to `/login` for every caller — this exact bug shipped
+  once and was only caught by testing the deployed endpoint directly.
+- Renders the registry as `/` (a filterable, searchable grid) and
+  `/apps/[name]` (detail view). Status and health are shown as plain
+  sentences, never raw enum values — a future field that adds a new status
+  or health value needs a label added to `STATUS_LABEL`/`HEALTH_LABEL`,
+  not just the schema.
+
+**Never let `WERFT_REGISTRY_TOKEN` or `CRON_SECRET` reach a client component
+or a public route.** Both are server-only, checked inside route handlers,
+never exposed via `NEXT_PUBLIC_*` or returned in a response body.
