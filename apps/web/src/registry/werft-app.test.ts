@@ -36,6 +36,28 @@ describe("werftAppPayloadSchema", () => {
     expect(werftAppPayloadSchema.safeParse({ ...valid, status: "live" }).success).toBe(false)
   })
 
+  it("treats lastDeployAt as optional, so every werft.json stays free of it", () => {
+    expect(werftAppPayloadSchema.safeParse(valid).success).toBe(true)
+    expect("lastDeployAt" in valid).toBe(false)
+  })
+
+  it("accepts a real deploy date, so correcting a description cannot invent one", () => {
+    const parsed = werftAppPayloadSchema.safeParse({
+      ...valid,
+      lastDeployAt: "2026-06-19T22:25:43.000Z",
+    })
+    expect(parsed.success).toBe(true)
+    expect(parsed.success && parsed.data.lastDeployAt).toBe("2026-06-19T22:25:43.000Z")
+  })
+
+  it("rejects a lastDeployAt that is not a real timestamp", () => {
+    for (const bad of ["yesterday", "2026-13-01T00:00:00Z", "1750000000"]) {
+      expect(werftAppPayloadSchema.safeParse({ ...valid, lastDeployAt: bad }).success, bad).toBe(
+        false,
+      )
+    }
+  })
+
   it("rejects a missing field rather than defaulting it", () => {
     const { description: _description, ...withoutDescription } = valid
     expect(werftAppPayloadSchema.safeParse(withoutDescription).success).toBe(false)
