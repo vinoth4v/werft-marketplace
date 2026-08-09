@@ -44,6 +44,9 @@ export async function scaffoldAction(formData: FormData): Promise<void> {
     redirect(`/new?error=${encodeURIComponent(`${first?.path.join(".")}: ${first?.message}`)}`)
   }
 
+  // .catch, not bare await: a network failure here would otherwise escape the
+  // action and render Next's generic error page instead of the form's own
+  // error banner — the sibling actions in apps/[name] already guard this.
   const response = await fetch(DISPATCH_URL, {
     method: "POST",
     headers: {
@@ -52,7 +55,11 @@ export async function scaffoldAction(formData: FormData): Promise<void> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ ref: "main", inputs: toDispatchInputs(parsed.data) }),
-  })
+  }).catch(() => null)
+
+  if (!response) {
+    redirect("/new?error=could+not+reach+GitHub")
+  }
 
   // 204 is the only success GitHub sends for a dispatch.
   if (response.status !== 204) {

@@ -16,35 +16,39 @@ export default async function LoginPage({
 
   return (
     <main>
-      <h1>Sign in</h1>
-      <p className="subtitle">
-        Single-operator app: only the one email set at scaffold time can get in.
-      </p>
-
-      {error ? (
-        // Never say which half was wrong.
-        <p role="alert">That email and password combination was not accepted.</p>
-      ) : null}
-
-      <form action={signInAction}>
-        <p>
-          <label htmlFor="email">Email</label>
-          <br />
-          <input id="email" name="email" type="email" autoComplete="username" required />
+      <div className="login-card">
+        <h1>Sign in</h1>
+        <p className="subtitle">
+          Single-operator app: only the one email set at scaffold time can get in.
         </p>
-        <p>
-          <label htmlFor="password">Password</label>
-          <br />
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-          />
-        </p>
-        <button type="submit">Sign in</button>
-      </form>
+
+        {error ? (
+          // Never say which half was wrong.
+          <p role="alert">That email and password combination was not accepted.</p>
+        ) : null}
+
+        <form action={signInAction}>
+          <p>
+            <label htmlFor="email">Email</label>
+            <br />
+            <input id="email" name="email" type="email" autoComplete="username" required />
+          </p>
+          <p>
+            <label htmlFor="password">Password</label>
+            <br />
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              required
+            />
+          </p>
+          <button type="submit" className="login-submit">
+            Sign in
+          </button>
+        </form>
+      </div>
 
       <p className="field-hint login-hint">
         Forgot the password? There is no reset flow, on purpose — generate a new hash with{" "}

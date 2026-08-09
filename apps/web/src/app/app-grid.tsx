@@ -22,6 +22,22 @@ function healthLabel(health: string): string {
 }
 
 /**
+ * Shown on the card only when the status is *not* the ordinary one: a wall
+ * where every card says "Active" is a wall saying nothing. An unknown status
+ * still renders — as itself, the same degrade-to-words rule as health.
+ */
+const STATUS_CHIP: Record<string, string | null> = {
+  active: null,
+  prototype: "Prototype",
+  paused: "Paused",
+  archived: "Archived",
+}
+
+function statusChip(status: string): string | null {
+  return STATUS_CHIP[status] === undefined ? status : STATUS_CHIP[status]
+}
+
+/**
  * Everything below is client-side filtering over data already fetched on the
  * server. A single operator's own apps is a small, known list — there is no
  * reason to round-trip a search query to the database.
@@ -128,8 +144,13 @@ function AppCard({ app }: { app: WerftAppRow }) {
       <Link href={`/apps/${app.name}`} className="app-card-link">
         <div className="app-card-header">
           <h2>{app.title ?? app.name}</h2>
-          <span className={`health-dot health-${app.health}`} title={healthLabel(app.health)}>
-            <span className="sr-only">{healthLabel(app.health)}</span>
+          <span className="app-card-signals">
+            {statusChip(app.status) && (
+              <span className="status-chip">{statusChip(app.status)}</span>
+            )}
+            <span className={`health-dot health-${app.health}`} title={healthLabel(app.health)}>
+              <span className="sr-only">{healthLabel(app.health)}</span>
+            </span>
           </span>
         </div>
         <p className="app-card-description">{app.description}</p>
