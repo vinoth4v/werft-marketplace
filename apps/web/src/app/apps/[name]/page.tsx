@@ -1,10 +1,11 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { openPullRequests } from "@/lib/github"
 import { MODEL_LABELS, MODELS } from "@/lib/models"
 import { formatRelative, formatUtc } from "@/lib/time"
 import { getAppByName } from "@/registry/queries"
-import { requestFeatureAction, retireAppAction } from "./actions.ts"
+import { mergePullRequestAction, requestFeatureAction, retireAppAction } from "./actions.ts"
 
 export const dynamic = "force-dynamic"
 
@@ -40,7 +41,12 @@ export default async function AppDetailPage({
   searchParams,
 }: {
   params: Promise<{ name: string }>
-  searchParams: Promise<{ error?: string; requested?: string; retiring?: string }>
+  searchParams: Promise<{
+    error?: string
+    requested?: string
+    retiring?: string
+    merging?: string
+  }>
 }) {
   const { name } = await params
   const banner = await searchParams
@@ -48,6 +54,9 @@ export default async function AppDetailPage({
   if (!app) notFound()
 
   const deployedAt = new Date(app.lastDeployAt)
+  // Straight from GitHub, uncached: a stale green tick invites a click the
+  // merge workflow would refuse.
+  const pulls = await openPullRequests(app.name)
 
   return (
     <main className="wide">
@@ -155,6 +164,62 @@ export default async function AppDetailPage({
           Retiring {app.title ?? app.name}. You will get an issue in werft-template saying what was
           removed, and what survived if anything did.
         </p>
+      )}
+
+      {banner.merging && (
+        <p className="banner banner-ok" role="status">
+          Merging #{banner.merging}. The gates are checked once more before it lands, then the
+          deploy applies any migration before building.
+        </p>
+      )}
+
+      {pulls.length > 0 && (
+        <section className="help-box">
+          <h2>Waiting for you ({pulls.length})</h2>
+          <p className="field-hint">
+            Work Claude has finished. Merging deploys it — the gates are read again from GitHub
+            first, so a button that has gone stale cannot let anything through.
+          </p>
+          {pulls.map((pull) => (
+            <div key={pull.number} className="pull">
+              <p className="pull-title">
+                <a href={pull.url} target="_blank" rel="noreferrer">
+                  #{pull.number} {pull.title}
+                </a>
+              </p>
+              <div className="badges">
+                {pull.gates.map((gate) => (
+                  <span
+                    key={gate.name}
+                    className={
+                      gate.status !== "completed"
+                        ? "badge badge-muted"
+                        : gate.conclusion === "success" ||
+                            gate.conclusion === "skipped" ||
+                            gate.conclusion === "neutral"
+                          ? "badge badge-ok"
+                          : "badge badge-bad"
+                    }
+                  >
+                    {gate.name}
+                    {gate.status !== "completed" ? " …" : ""}
+                  </span>
+                ))}
+              </div>
+              {pull.mergeable ? (
+                <form action={mergePullRequestAction}>
+                  <input type="hidden" name="app_name" value={app.name} />
+                  <input type="hidden" name="pr" value={String(pull.number)} />
+                  <button type="submit">Merge and deploy</button>
+                </form>
+              ) : (
+                <p className="field-hint">
+                  Not ready: {pull.blockedBecause}. Read it on GitHub if it needs a decision.
+                </p>
+              )}
+            </div>
+          ))}
+        </section>
       )}
 
       <section className="help-box">

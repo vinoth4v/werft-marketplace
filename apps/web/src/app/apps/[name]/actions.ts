@@ -112,3 +112,33 @@ export async function retireAppAction(formData: FormData): Promise<void> {
       : `/apps/${app}?error=${encodeURIComponent(result.error)}`,
   )
 }
+
+/**
+ * Merges a pull request, by asking the runner that holds the credential.
+ *
+ * The button only appears when every gate is green, but this action does not
+ * rely on that and neither does the workflow: gate state is read again from
+ * GitHub immediately before the merge, and a pending check is refused as firmly
+ * as a failing one. A page that has been open for ten minutes is not an
+ * authorisation.
+ */
+export async function mergePullRequestAction(formData: FormData): Promise<void> {
+  const app = String(formData.get("app_name") ?? "")
+  const pr = String(formData.get("pr") ?? "").trim()
+
+  if (!/^[0-9]+$/.test(pr)) {
+    redirect(`/apps/${app}?error=${encodeURIComponent("that is not a pull request number")}`)
+  }
+  if (app === "werft-template" || app === "werft-marketplace") {
+    redirect(
+      `/apps/${app}?error=${encodeURIComponent("that is Werft itself — merge its pull requests on GitHub")}`,
+    )
+  }
+
+  const result = await dispatch("merge-pr.yml", { app_name: app, pr })
+  redirect(
+    result.ok
+      ? `/apps/${app}?merging=${pr}`
+      : `/apps/${app}?error=${encodeURIComponent(result.error)}`,
+  )
+}
