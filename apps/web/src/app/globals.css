@@ -785,3 +785,30 @@ input:hover {
 .danger-box input:invalid {
   border-color: var(--color-danger);
 }
+
+/* ---- pull requests waiting to be merged ---------------------------------- */
+
+.pull {
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.pull:first-of-type {
+  border-top: none;
+}
+
+.pull-title {
+  margin: 0 0 var(--space-2);
+  font-weight: var(--font-weight-medium);
+}
+
+/* A gate's state has to be legible without reading the label, but colour alone
+   would fail anyone who cannot see it — so the running ones also say "…". */
+.badge-ok {
+  border-color: var(--color-success);
+}
+
+.badge-bad {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
