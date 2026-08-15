@@ -542,6 +542,22 @@ input:hover {
   background: var(--color-bg);
 }
 
+/* Who pays for the run is a real division, so the group heading is styled to
+   read as a heading rather than as another option. Native <optgroup> honours
+   little else across browsers — weight, size and colour are the reliable
+   three, so those are all this asks for. */
+.model-select optgroup {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-muted);
+}
+
+.model-select option {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-fg);
+}
+
 .form-field textarea {
   resize: vertical;
 }

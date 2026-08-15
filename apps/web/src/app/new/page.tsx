@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { CopyButton } from "@/app/copy-button"
-import { MODEL_LABELS, MODELS } from "@/lib/models"
+import { ModelPicker } from "@/app/model-picker"
 import { scaffoldAction } from "./actions.ts"
 import { BuildPlanField } from "./build-plan-field.tsx"
 import { ThemePicker } from "./theme-picker.tsx"
@@ -163,20 +163,17 @@ export default async function NewAppPage({
           </label>
         </div>
 
-        <div className="form-field">
-          <label htmlFor="model">Model</label>
-          <select id="model" name="model" defaultValue="">
-            {MODELS.map((model) => (
-              <option key={model} value={model}>
-                {MODEL_LABELS[model]}
-              </option>
-            ))}
-          </select>
-          <p className="field-hint">
-            A long plan earns the strongest model; a small one does not. Only used if you give a
-            build plan below.
-          </p>
-        </div>
+        <ModelPicker
+          hint={
+            <>
+              A long plan earns the strongest model; a small one does not. Only used if you give a
+              build plan below. <strong>DeepSeek</strong> builds through the Kompass gateway instead
+              of the subscription — free, but slower and less capable. It needs werft-template's{" "}
+              <code>scaffold-app.yml</code> to offer it as a choice first; until it does, GitHub
+              refuses the dispatch outright rather than falling back.
+            </>
+          }
+        />
 
         <BuildPlanField name="build_plan" />
 

@@ -100,9 +100,19 @@ describe("toDispatchInputs", () => {
     expect(toDispatchInputs(scaffoldFormSchema.parse(valid)).model).toBe("")
   })
 
+  it("passes deepseek through as the gateway lane, spelled exactly as the runner reads it", () => {
+    // The workflow greps the issue body for werft:model=[a-z0-9.-]+ and then
+    // matches the capture against its own allowlist. Anything this app forwards
+    // has to survive that pattern, or it is dropped before the allowlist runs.
+    const dispatched = toDispatchInputs(scaffoldFormSchema.parse({ ...valid, model: "deepseek" }))
+    expect(dispatched.model).toBe("deepseek")
+    expect(dispatched.model).toMatch(/^[a-z0-9.-]+$/)
+  })
+
   it("refuses a model that is not on the list, rather than forwarding it", () => {
     // It becomes a command-line argument on the other side of the dispatch.
     expect(scaffoldFormSchema.safeParse({ ...valid, model: "gpt-4" }).success).toBe(false)
     expect(scaffoldFormSchema.safeParse({ ...valid, model: "opus; rm -rf /" }).success).toBe(false)
+    expect(scaffoldFormSchema.safeParse({ ...valid, model: "deepseek-chat" }).success).toBe(false)
   })
 })

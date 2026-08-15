@@ -1,6 +1,7 @@
 "use server"
 
 import { redirect } from "next/navigation"
+import { MODELS } from "@/lib/models"
 
 /**
  * Per-app actions: ask for a change, or retire the app.
@@ -62,8 +63,10 @@ export async function requestFeatureAction(formData: FormData): Promise<void> {
   }
 
   // Validated here as well as in the workflow: this ends up as a command-line
-  // argument, and a form field is not a trustworthy source for one.
-  const chosen = ["opus", "sonnet", "haiku"].includes(model) ? model : ""
+  // argument, and a form field is not a trustworthy source for one. Checked
+  // against MODELS rather than a copy of it — a copy is how a model added to
+  // the picker gets accepted by the form and dropped on the way out.
+  const chosen = (MODELS as readonly string[]).includes(model) ? model : ""
   const result = await dispatch("request-feature.yml", {
     app_name: app,
     request,

@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { ModelPicker } from "@/app/model-picker"
 import { openPullRequests } from "@/lib/github"
-import { MODEL_LABELS, MODELS } from "@/lib/models"
 import { formatRelative, formatUtc } from "@/lib/time"
 import { getAppByName } from "@/registry/queries"
 import { mergePullRequestAction, requestFeatureAction, retireAppAction } from "./actions.ts"
@@ -237,20 +237,16 @@ export default async function AppDetailPage({
             <label htmlFor="title">Title (optional)</label>
             <input id="title" name="title" maxLength={80} placeholder="Add a CSV export" />
           </div>
-          <div className="form-field">
-            <label htmlFor="model">Model</label>
-            <select id="model" name="model" defaultValue="">
-              {MODELS.map((model) => (
-                <option key={model} value={model}>
-                  {MODEL_LABELS[model]}
-                </option>
-              ))}
-            </select>
-            <p className="field-hint">
-              Match it to the work: a rename does not need what a new feature needs, and the
-              subscription's window is finite.
-            </p>
-          </div>
+          <ModelPicker
+            hint={
+              <>
+                Match it to the work: a rename does not need what a new feature needs, and the
+                subscription's window is finite. <strong>DeepSeek</strong> runs through the Kompass
+                gateway and spends none of that window — once werft-template's{" "}
+                <code>request-feature.yml</code> offers it as a choice.
+              </>
+            }
+          />
           <div className="form-field">
             <label htmlFor="request">What should change?</label>
             <textarea
