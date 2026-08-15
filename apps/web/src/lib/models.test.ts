@@ -27,9 +27,37 @@ describe("models", () => {
     }
   })
 
-  it("offers the gateway lane as well as the subscription", () => {
-    expect(MODELS).toContain("deepseek")
-    const gateway = MODEL_GROUPS.find((group) => group.label === "Kompass gateway")
-    expect(gateway?.models).toContain("deepseek")
+  it("keeps routed and pinned as separate groups, because they fail differently", () => {
+    // A lane can fall back across its chain; a pin cannot fall back at all.
+    // Collapsing them into one "Kompass" group would hide the only difference
+    // that matters when a provider goes down mid-build.
+    const routed = MODEL_GROUPS.find((group) => group.label.includes("routed"))
+    const pinned = MODEL_GROUPS.find((group) => group.label.includes("pinned"))
+    expect(routed?.models).toContain("kompass-hard")
+    expect(pinned?.models).toContain("deepseek")
+    expect(routed?.models).not.toContain("deepseek")
+  })
+
+  it("names every lane exactly as the gateway does, since those pass straight through", () => {
+    // Lane slugs are not translated by claude.yml — they are handed to
+    // --model verbatim, so a typo here is a typo the gateway rejects.
+    const routed = MODEL_GROUPS.find((group) => group.label.includes("routed"))
+    expect([...(routed?.models ?? [])].sort()).toEqual([
+      "kompass",
+      "kompass-agentic",
+      "kompass-fast",
+      "kompass-hard",
+      "kompass-longctx",
+      "kompass-simple",
+    ])
+  })
+
+  it("keeps pinned slugs clear of the lane namespace", () => {
+    // A pin named `kompass-something` would be indistinguishable from a lane
+    // in claude.yml's case, and would silently route instead of pinning.
+    const pinned = MODEL_GROUPS.find((group) => group.label.includes("pinned"))
+    for (const model of pinned?.models ?? []) {
+      expect(model.startsWith("kompass")).toBe(false)
+    }
   })
 })

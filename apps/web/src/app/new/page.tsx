@@ -167,10 +167,11 @@ export default async function NewAppPage({
           hint={
             <>
               A long plan earns the strongest model; a small one does not. Only used if you give a
-              build plan below. <strong>DeepSeek</strong> builds through the Kompass gateway instead
-              of the subscription — free, but slower and less capable. It needs werft-template's{" "}
-              <code>scaffold-app.yml</code> to offer it as a choice first; until it does, GitHub
-              refuses the dispatch outright rather than falling back.
+              build plan below. The <strong>gateway</strong> options spend no subscription window:{" "}
+              <em>routed</em> lets Kompass pick and fall back if a model is down, <em>pinned</em>{" "}
+              gives you exactly one model and fails the build if that one is unavailable. They need
+              werft-template's <code>scaffold-app.yml</code> to offer them as choices first; until
+              it does, GitHub refuses the dispatch outright rather than falling back.
             </>
           }
         />

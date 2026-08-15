@@ -241,9 +241,10 @@ export default async function AppDetailPage({
             hint={
               <>
                 Match it to the work: a rename does not need what a new feature needs, and the
-                subscription's window is finite. <strong>DeepSeek</strong> runs through the Kompass
-                gateway and spends none of that window — once werft-template's{" "}
-                <code>request-feature.yml</code> offers it as a choice.
+                subscription's window is finite. The <strong>gateway</strong> options spend none of
+                it — routed lets Kompass pick and fall back, pinned gives you one exact model and no
+                fallback — once werft-template's <code>request-feature.yml</code> offers them as
+                choices.
               </>
             }
           />
