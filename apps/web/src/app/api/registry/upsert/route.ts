@@ -53,6 +53,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       private: app.private,
       repoUrl: repoUrlFor(app.name),
       lastDeployAt: deployedAt,
+      graph: app.graph ?? null,
       updatedAt: new Date(),
     })
     .onConflictDoUpdate({
@@ -67,6 +68,11 @@ export async function POST(request: Request): Promise<NextResponse> {
         private: app.private,
         repoUrl: repoUrlFor(app.name),
         lastDeployAt: deployedAt,
+        // Absent means "this sender had nothing to report", not "delete what
+        // you have". A CI run where the graph build failed, or an app whose
+        // metadata is being corrected by hand, must not blank a graph that
+        // was reported correctly last time.
+        ...(app.graph ? { graph: app.graph } : {}),
         updatedAt: new Date(),
       },
     })

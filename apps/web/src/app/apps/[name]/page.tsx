@@ -6,6 +6,7 @@ import { openPullRequests } from "@/lib/github"
 import { formatRelative, formatUtc } from "@/lib/time"
 import { getAppByName } from "@/registry/queries"
 import { mergePullRequestAction, requestFeatureAction, retireAppAction } from "./actions.ts"
+import { GraphPanel } from "./graph-panel"
 
 export const dynamic = "force-dynamic"
 
@@ -171,6 +172,10 @@ export default async function AppDetailPage({
           Merging #{banner.merging}. The gates are checked once more before it lands, then the
           deploy applies any migration before building.
         </p>
+      )}
+
+      {app.graph && (
+        <GraphPanel summary={app.graph} appName={app.title ?? app.name} repoUrl={app.repoUrl} />
       )}
 
       {pulls.length > 0 && (
