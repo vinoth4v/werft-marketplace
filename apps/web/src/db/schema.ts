@@ -1,4 +1,5 @@
 import { boolean, index, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
+import type { GraphSummary } from "@/registry/graph-summary"
 
 /**
  * Append-only record of things worth knowing after the fact: sign-ins,
@@ -52,6 +53,11 @@ export const werftApp = pgTable(
     // serves — recorded once here rather than recomputed by every reader.
     repoUrl: text("repo_url").notNull(),
     lastDeployAt: timestamp("last_deploy_at", { withTimezone: true }).notNull().defaultNow(),
+    // A summary of the app's knowledge graph, posted by its CI alongside
+    // werft.json. Nullable rather than defaulted: "this app has never
+    // reported a graph" and "this app reported an empty one" are different
+    // facts, and only the first should render as nothing at all.
+    graph: jsonb("graph").$type<GraphSummary>(),
     health: text("health").notNull().default("unknown"),
     healthCheckedAt: timestamp("health_checked_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

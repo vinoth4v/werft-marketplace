@@ -919,3 +919,54 @@ input:hover {
   width: 100%;
   margin-top: var(--space-2);
 }
+
+/* ---- knowledge graph panel ----------------------------------------------- */
+
+.graph-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  margin: var(--space-3) 0;
+}
+
+.graph-stats dt {
+  margin-bottom: var(--space-1);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-muted);
+}
+
+.graph-stats dd {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.graph-canvas {
+  display: block;
+  width: 100%;
+  margin: var(--space-2) 0 var(--space-3);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  /* The dots are the only hit targets; a text cursor over them reads as
+     selectable text that is not there. */
+  cursor: crosshair;
+}
+
+.graph-hubs-heading {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-muted);
+}
+
+.graph-hub-degree {
+  margin-left: var(--space-1);
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.graph-repo-hint {
+  margin-top: var(--space-3);
+}

@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { graphSummarySchema } from "./graph-summary"
 
 /**
  * What an app posts to /api/registry/upsert — the same shape as werft.json,
@@ -40,6 +41,15 @@ export const werftAppPayloadSchema = z.object({
    * nothing.
    */
   lastDeployAt: z.iso.datetime().optional(),
+  /**
+   * The app's knowledge graph, summarised by its own CI from the committed
+   * graphify-out/graph.json.
+   *
+   * Optional on purpose, and in both directions: an app scaffolded before
+   * graphify existed has none, and an app whose graph build failed should
+   * still register itself rather than drop off the wall over a visualisation.
+   */
+  graph: graphSummarySchema.optional(),
 })
 
 export type WerftAppPayload = z.infer<typeof werftAppPayloadSchema>

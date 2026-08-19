@@ -84,6 +84,39 @@ describe("werftAppPayloadSchema", () => {
     const { description: _description, ...withoutDescription } = valid
     expect(werftAppPayloadSchema.safeParse(withoutDescription).success).toBe(false)
   })
+
+  /**
+   * Every app scaffolded before graphify existed posts no graph, and an app
+   * whose graph build failed should still register itself.
+   */
+  it("treats graph as optional", () => {
+    expect(werftAppPayloadSchema.safeParse(valid).success).toBe(true)
+  })
+
+  it("accepts a payload carrying a graph summary", () => {
+    const withGraph = {
+      ...valid,
+      graph: {
+        nodes: 12,
+        edges: 4,
+        communities: 2,
+        hubs: [{ label: "index.ts", degree: 4 }],
+        sample: {
+          nodes: [
+            { label: "index.ts", community: 0, degree: 4 },
+            { label: "db.ts", community: 1, degree: 1 },
+          ],
+          edges: [[0, 1]],
+        },
+      },
+    }
+    expect(werftAppPayloadSchema.safeParse(withGraph).success).toBe(true)
+  })
+
+  it("rejects a payload whose graph is malformed, rather than storing it", () => {
+    const bad = { ...valid, graph: { nodes: 12 } }
+    expect(werftAppPayloadSchema.safeParse(bad).success).toBe(false)
+  })
 })
 
 describe("repoUrlFor", () => {
