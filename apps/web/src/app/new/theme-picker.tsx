@@ -39,7 +39,7 @@ const THEMES: ThemePreview[] = [
   {
     key: "madras",
     label: "Madras",
-    note: "Warm paper, terracotta, serif — from SruthiScribe",
+    note: "Warm paper, terracotta, serif — from SwaraScribe",
     bg: "#faf7f2",
     surface: "#ffffff",
     fg: "#2d2a26",

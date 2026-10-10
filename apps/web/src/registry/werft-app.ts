@@ -13,8 +13,8 @@ const NAME_PATTERN = /^[a-z][a-z0-9-]{0,38}[a-z0-9]$/
 export const werftAppPayloadSchema = z.object({
   name: z.string().regex(NAME_PATTERN),
   /**
-   * How the app brands itself, for display only — "SruthiScribe Learn" rather
-   * than the `sruthiscribe-learn` slug that `name` is forced to be by having
+   * How the app brands itself, for display only — "SwaraScribe Learn" rather
+   * than the `swarascribe-learn` slug that `name` is forced to be by having
    * to serve as a repo, a database and a subdomain at once.
    *
    * Optional, and never a substitute for `name`: nothing is looked up by it.

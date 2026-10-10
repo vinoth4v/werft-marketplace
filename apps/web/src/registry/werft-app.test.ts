@@ -43,10 +43,10 @@ describe("werftAppPayloadSchema", () => {
 
   it("accepts a display title that the slug rules would reject", () => {
     // The whole point: `name` must be a repo, database and subdomain, so it
-    // can never be "SruthiScribe Learn". The title can.
-    const parsed = werftAppPayloadSchema.safeParse({ ...valid, title: "SruthiScribe Learn" })
+    // can never be "SwaraScribe Learn". The title can.
+    const parsed = werftAppPayloadSchema.safeParse({ ...valid, title: "SwaraScribe Learn" })
     expect(parsed.success).toBe(true)
-    expect(parsed.success && parsed.data.title).toBe("SruthiScribe Learn")
+    expect(parsed.success && parsed.data.title).toBe("SwaraScribe Learn")
   })
 
   it("rejects a blank or whitespace-only title rather than storing an empty heading", () => {

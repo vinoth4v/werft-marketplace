@@ -37,8 +37,8 @@ export const werftApp = pgTable(
     // Matches werft.json's name — also the GitHub repo, Neon project and
     // Vercel project name, so it's unique by construction, not by convention.
     name: text("name").notNull().unique(),
-    // How the app brands itself — "SruthiScribe Learn", not
-    // "sruthiscribe-learn". Nullable: `name` has to be a valid repo, database
+    // How the app brands itself — "SwaraScribe Learn", not
+    // "swarascribe-learn". Nullable: `name` has to be a valid repo, database
     // and subdomain all at once, so it is a slug by necessity, and an app that
     // never sets a title just displays its slug as before.
     title: text("title"),
