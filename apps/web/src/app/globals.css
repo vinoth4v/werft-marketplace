@@ -729,7 +729,7 @@ input:hover {
 }
 
 /* The slug under a titled app's heading: this page is where the repo,
-   database and Vercel project name is the useful fact, not the brand. */
+   database and Coolify app name is the useful fact, not the brand. */
 .slug {
   margin: calc(-1 * var(--space-2)) 0 0;
   font-family: var(--font-family-mono);

@@ -10,7 +10,6 @@ const valid = {
   visibility: "public",
   status: "prototype",
   deploy: true,
-  vercel_sso: false,
   region: "",
   with_s3: false,
   theme: "werft",
@@ -44,7 +43,6 @@ describe("toDispatchInputs", () => {
   it("stringifies booleans, because the dispatch API takes only strings", () => {
     const inputs = toDispatchInputs(scaffoldFormSchema.parse(valid))
     expect(inputs.deploy).toBe("true")
-    expect(inputs.vercel_sso).toBe("false")
   })
 
   it("sends every field the workflow declares, nothing extra", () => {
@@ -61,7 +59,6 @@ describe("toDispatchInputs", () => {
       "tags",
       "theme",
       "title",
-      "vercel_sso",
       "visibility",
       "with_s3",
     ])

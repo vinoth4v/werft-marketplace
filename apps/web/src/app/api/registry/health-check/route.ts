@@ -3,18 +3,17 @@ import { NextResponse } from "next/server"
 import { db } from "@/db/client"
 import { werftApp } from "@/db/schema"
 
-// Vercel Cron requests time out its own functions well before this, but a
-// slow app under test must not be allowed to stall every other app's check.
+// The scheduled run waits for this route, but a slow app under test must not
+// be allowed to stall every other app's check.
 const PER_APP_TIMEOUT_MS = 8000
 
 /**
- * Nightly, via vercel.json's crons entry. Vercel signs cron requests with
- * CRON_SECRET automatically — this route only has to check for it, never
- * generate or store it itself.
+ * Nightly, as a Coolify scheduled task (homestack's coolify_migrate.py turns
+ * vercel.json's crons entry into one) that calls this route with
+ * Authorization: Bearer <CRON_SECRET> — this route only has to check for it.
  *
  * Fails closed: a missing CRON_SECRET rejects the request rather than
- * skipping the check. This matches Vercel's own documented pattern —
- * `!cronSecret || header !== ...` — the opposite of what shipped first,
+ * skipping the check (`!cronSecret || header !== ...`) — the opposite of what shipped first,
  * which treated an unconfigured secret as "no check needed" and left this
  * open to the internet until it was tested against the real deployment.
  */

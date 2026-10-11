@@ -12,17 +12,11 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic"
 
-const SCAFFOLD_COMMAND = `export NEON_API_KEY="$(cat ~/.config/werft/neon-key)"
-cd ~/Documents/workspace/werft-template
-pnpm create-app \\
-  --name my-app \\
-  --description "One line for the card on this page." \\
-  --dir ~/Documents/workspace/my-app \\
-  --email you@example.com \\
-  --password 'at least 12 characters' \\
-  --tags personal \\
-  --public \\
-  --yes`
+const SCAFFOLD_COMMAND = `gh workflow run scaffold-app.yml --repo vinoth4v/werft-template \\
+  -f app_name=my-app \\
+  -f description="One line for the card on this page." \\
+  -f email=you@example.com \\
+  -f visibility=public -f status=prototype -f theme=werft`
 
 export default async function NewAppPage({
   searchParams,
@@ -76,7 +70,7 @@ export default async function NewAppPage({
             title="Lowercase letters, digits and hyphens; 2–40 characters"
           />
           <p className="field-hint">
-            Becomes the GitHub repo, the database, the Vercel project and the URL (name.vercel.app)
+            Becomes the GitHub repo, the database, the Coolify app and the URL (name.vinothkannan.de)
             — choose like it's permanent.
           </p>
         </div>
@@ -133,15 +127,16 @@ export default async function NewAppPage({
         </div>
 
         <div className="form-field">
-          <label htmlFor="region">Region</label>
+          <label htmlFor="region">S3 region</label>
           <select id="region" name="region" defaultValue="">
-            <option value="">Provider default (fastest to provision)</option>
-            <option value="us-east">US East — database, functions and bucket together</option>
-            <option value="eu-central">Europe (Frankfurt) — all three together</option>
-            <option value="us-west">US West — all three together</option>
+            <option value="">Default (Europe, Frankfurt)</option>
+            <option value="us-east">US East</option>
+            <option value="eu-central">Europe (Frankfurt)</option>
+            <option value="us-west">US West</option>
           </select>
           <p className="field-hint">
-            One choice co-locates the database, the functions and (if enabled) the S3 bucket.
+            Only where the optional S3 bucket lives. The app and its database run on the home
+            server.
           </p>
         </div>
 
@@ -156,10 +151,6 @@ export default async function NewAppPage({
               — Werft mints a bucket and a key scoped to only that bucket; you never touch the AWS
               console
             </span>
-          </label>
-          <label className="check">
-            <input type="checkbox" name="vercel_sso" /> Put Vercel SSO in front of the whole
-            deployment <span className="field-hint">(breaks preview URLs — rarely wanted)</span>
           </label>
         </div>
 
@@ -190,7 +181,9 @@ export default async function NewAppPage({
       <details className="cli-details">
         <summary>Prefer the terminal?</summary>
         <p className="field-hint">
-          Same scaffold, run locally — and the only way to set the password in the same step:
+          Same scaffold from the terminal: it starts the same workflow on the home runner (the only
+          place Coolify and the database are reachable). For a per-app password, run
+          <code>pnpm werft-password</code> afterwards.
         </p>
         <div className="command-block">
           <pre>{SCAFFOLD_COMMAND}</pre>
@@ -217,8 +210,8 @@ export default async function NewAppPage({
             workflow from its Actions tab to retry with a stronger model.
           </li>
           <li>
-            <strong>Retiring an app?</strong> Delete its repo, Neon and Vercel projects, then remove
-            its card: <code>DELETE /api/registry/apps/&lt;name&gt;</code> with the registry token.
+            <strong>Retiring an app?</strong> Use <em>Retire</em> on its page here: it removes the
+            Coolify app, its databases, any S3 bucket and its card, on the home runner.
           </li>
         </ul>
       </section>

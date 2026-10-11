@@ -7,8 +7,9 @@ import { MODELS } from "@/lib/models"
  * Per-app actions: ask for a change, or retire the app.
  *
  * Both dispatch a workflow in werft-template rather than acting directly, for
- * the same reason creating an app does: that repo holds the credentials — Neon,
- * Vercel, AWS, a repo-writing GitHub token — and this app holds one token whose
+ * the same reason creating an app does: its workflows run on the home runner, which
+ * holds the Coolify and database credentials (with AWS and a repo-writing GitHub
+ * token in that repo) — and this app holds one token whose
  * only power is to ask. A web page that could delete a database directly would
  * be a much larger thing to get right.
  */

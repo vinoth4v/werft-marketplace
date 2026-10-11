@@ -287,8 +287,8 @@ export default async function AppDetailPage({
         <section className="help-box danger-box">
           <h2>Retire this app</h2>
           <p className="field-hint">
-            Removes the Vercel project, the Neon database and everything in it, any S3 bucket and
-            its scoped AWS user, and this card. <strong>None of it can be undone.</strong> The
+            Removes the Coolify app (and its previews), its databases and everything in them, any S3
+            bucket and its scoped AWS user, and this card. <strong>None of it can be undone.</strong> The
             GitHub repository is kept unless you tick the box, so the code survives by default.
           </p>
           <form action={retireAppAction} className="scaffold-form">
