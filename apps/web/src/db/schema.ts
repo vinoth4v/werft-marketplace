@@ -33,8 +33,8 @@ export const werftApp = pgTable(
   "werft_app",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    // Matches werft.json's name — also the GitHub repo, Neon project and
-    // Vercel project name, so it's unique by construction, not by convention.
+    // Matches werft.json's name — also the GitHub repo, database and Coolify
+    // app name, so it's unique by construction, not by convention.
     name: text("name").notNull().unique(),
     // How the app brands itself — "SruthiScribe Learn", not
     // "sruthiscribe-learn". Nullable: `name` has to be a valid repo, database

@@ -4,8 +4,8 @@ import { MODELS } from "./models.ts"
 /**
  * The /new form's contract with werft-template's scaffold-app.yml dispatch.
  *
- * Same name rule as werft.json enforces — the name becomes a repo, a Neon
- * project, a Vercel project and a subdomain, so rejecting it here beats a
+ * Same name rule as werft.json enforces — the name becomes a repo, a
+ * database, a Coolify app and a subdomain, so rejecting it here beats a
  * runner failing three resources in.
  */
 const NAME_PATTERN = /^[a-z][a-z0-9-]{0,38}[a-z0-9]$/
@@ -36,9 +36,8 @@ export const scaffoldFormSchema = z.object({
   visibility: z.enum(["public", "private"]),
   status: z.enum(["prototype", "active", "paused", "archived"]),
   deploy: z.boolean(),
-  vercel_sso: z.boolean(),
-  // "" means each provider's own default — the workflow's region input allows
-  // it too, so an unregioned app behaves exactly as before.
+  // Where the optional S3 bucket lives; "" means the default (eu-central-1).
+  // The app and its database always run on the home server.
   region: z.enum(["", ...REGION_KEYS]),
   with_s3: z.boolean(),
   theme: z.enum(THEME_KEYS),
@@ -68,7 +67,6 @@ export function toDispatchInputs(form: ScaffoldForm): Record<string, string> {
     visibility: form.visibility,
     status: form.status,
     deploy: String(form.deploy),
-    vercel_sso: String(form.vercel_sso),
     region: form.region,
     with_s3: String(form.with_s3),
     theme: form.theme,

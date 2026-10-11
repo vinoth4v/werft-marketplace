@@ -53,7 +53,7 @@ export default async function LoginPage({
       <p className="field-hint login-hint">
         Forgot the password? There is no reset flow, on purpose — generate a new hash with{" "}
         <code>pnpm hash-password</code> in the app's repo and update{" "}
-        <code>WERFT_PASSWORD_HASH</code> on Vercel.
+        <code>WERFT_PASSWORD_HASH</code> in Coolify, or run <code>pnpm werft-password</code> to change it everywhere.
       </p>
     </main>
   )

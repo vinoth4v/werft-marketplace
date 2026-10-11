@@ -12,8 +12,8 @@ const DISPATCH_URL =
  * A server action behind the session gate, on purpose: only the signed-in
  * operator can reach it, and the GitHub token that authorises the dispatch
  * lives only in this app's server environment — the browser never sees a
- * credential, and the marketplace never holds the Neon/Vercel/Kompass
- * secrets at all. Those stay in werft-template, where the runner is.
+ * credential, and the marketplace never holds the Coolify, database or Kompass
+ * secrets at all. Those stay with werft-template's home runner.
  */
 export async function scaffoldAction(formData: FormData): Promise<void> {
   const token = process.env.GH_DISPATCH_TOKEN
@@ -34,7 +34,6 @@ export async function scaffoldAction(formData: FormData): Promise<void> {
     // Checkboxes: present when ticked, absent when not.
     deploy: formData.get("deploy") === "on",
     with_s3: formData.get("with_s3") === "on",
-    vercel_sso: formData.get("vercel_sso") === "on",
     build_plan: String(formData.get("build_plan") ?? ""),
     model: String(formData.get("model") ?? ""),
   })

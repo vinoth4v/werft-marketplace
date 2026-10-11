@@ -3,7 +3,7 @@
  *
  * Deliberately hand-rolled rather than toLocaleString(): these run in server
  * components, where "the server's locale and timezone" is an accident of
- * where Vercel scheduled the lambda — the same row could render differently
+ * which server rendered the page — the same row could render differently
  * between deploys. Deterministic UTC output plus a relative phrase is both
  * stable and more useful ("2 hours ago" answers the actual question).
  */

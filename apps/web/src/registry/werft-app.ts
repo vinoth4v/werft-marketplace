@@ -23,7 +23,7 @@ export const werftAppPayloadSchema = z.object({
   description: z.string().min(1),
   stack: z.array(z.string().min(1)),
   // z.url() alone validates shape, not scheme — http:// passed it. Every
-  // real deploy is Vercel HTTPS, so a non-https, non-empty value is wrong.
+  // real deploy is HTTPS (Cloudflare in front of Coolify), so a non-https, non-empty value is wrong.
   url: z.union([z.literal(""), z.url().refine((value) => value.startsWith("https://"))]),
   tags: z.array(z.string().min(1)),
   status: z.enum(APP_STATUSES),
