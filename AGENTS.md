@@ -97,43 +97,36 @@ native build steps break fresh installs.
   with a dry run that does every local step and creates nothing remote.
 - Gate every pull request on four checks before merge: a secret scan, a
   typecheck, a build that must exit 0, and a Playwright smoke test against that
-  PR's real Vercel preview URL.
-- Give every pull request its own Neon database branch, migrated and wired to
-  its Vercel preview deployment, deleted when the PR closes.
+  PR's real preview, `https://pr<N>-<app>.vinothkannan.de`, built by Coolify on
+  the home server.
+- Previews never touch production data: every preview of an app runs against
+  `<db>_preview` on apps-db, a copy of production refreshed nightly
+  (`scripts/preview-db-refresh.sh` in homestack). The container migrates its own
+  database when it starts (`deploy/start.mjs`), and a preview refuses to start
+  unless its database name ends in `_preview`. Coolify removes a preview when
+  its PR closes, so there is nothing to clean up or reap.
 
-## Phase 2 repository secrets
+## Phase 2: deployment and the PR pipeline (self-hosted)
 
-The PR pipeline (`.github/workflows/pr-checks.yml`, `pr-cleanup.yml`) needs
-these as GitHub Actions secrets on the app's repository. None of them belong in
-werft.json or any committed file.
+The app is deployed by Coolify from this repository's `Dockerfile`: every push
+to `main` deploys production at `https://<app>.vinothkannan.de`, every PR gets a
+preview at `https://pr<N>-<app>.vinothkannan.de`. Nothing runs on Vercel or Neon.
 
-| Secret | Where it comes from |
-|---|---|
-| `NEON_API_KEY` | console.neon.tech → Account → API keys |
-| `NEON_PROJECT_ID` | the parent project's ID, printed when `create-werft-app` runs |
-| `VERCEL_TOKEN` | vercel.com → Account → Tokens |
-| `VERCEL_ORG_ID` | the Vercel team ID, only if the project belongs to a team |
-| `VERCEL_PROJECT_ID` | `.vercel/project.json` after `vercel link`, or the Vercel dashboard |
+- **Migrations**: `deploy/start.mjs` runs `pnpm run db:migrate` against the
+  container's own `DATABASE_URL` before starting Next.js. A failing migration
+  stops the new container, so the previous deployment keeps serving.
+- **The PR pipeline** (`.github/workflows/pr-checks.yml`) needs no deployment
+  secrets: `preview-smoke` waits (`.github/scripts/wait-for-preview.mjs`) until
+  the preview's `/werft-commit.txt` shows the PR's head commit, then runs
+  Playwright against it.
+- **Required checks** on `main`: `gitleaks`, `typecheck`, `build`,
+  `preview-smoke`. `preview-smoke` depends on `build` via `needs:`; that is
+  safe only because `build` is required itself: GitHub does not block on a
+  required check that was *skipped* (found the hard way when a migration bug
+  merged because only `preview-smoke` was required and it had skipped).
+- The template repository itself is never deployed, so `preview-smoke` cannot
+  pass there; its own `main` requires only `gitleaks`, `typecheck`, `build`.
 
-Branch protection on `main` must separately mark the checks as required — the
-workflow produces them, but cannot make GitHub enforce them. Requires GitHub
-Pro on a private repo (Free rejects the API call outright); a public repo
-gets it for free.
-
-**Which checks to require differs by repo.** An app scaffolded from this
-template has its own Neon and Vercel projects, so all four
-(`gitleaks`, `typecheck`, `build`, `preview-smoke`) belong in
-`required_status_checks`. This template repo itself is never deployed — it
-has no Neon or Vercel project of its own — so `neon-preview-branch` always
-fails there for a structural reason (`missing required env`) and
-`preview-smoke` always skips. Requiring either on **this** repo's own `main`
-would permanently block every PR here regardless of code quality. Verified by
-testing: a PR was genuinely refused by GitHub (`the base branch policy
-prohibits the merge`) with all four required, then merged cleanly once the
-required set here was narrowed to `gitleaks`, `typecheck`, `build`.
-
-Describe capabilities, not paths. File paths in agent context go stale and
-mislead; find the code by reading it.
 
 ## This app specifically: the Werft registry and marketplace
 
