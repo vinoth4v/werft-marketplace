@@ -43,10 +43,10 @@ describe("werftAppPayloadSchema", () => {
 
   it("accepts a display title that the slug rules would reject", () => {
     // The whole point: `name` must be a repo, database and subdomain, so it
-    // can never be "SruthiScribe Learn". The title can.
-    const parsed = werftAppPayloadSchema.safeParse({ ...valid, title: "SruthiScribe Learn" })
+    // can never be "SwaraScribe Learn". The title can.
+    const parsed = werftAppPayloadSchema.safeParse({ ...valid, title: "SwaraScribe Learn" })
     expect(parsed.success).toBe(true)
-    expect(parsed.success && parsed.data.title).toBe("SruthiScribe Learn")
+    expect(parsed.success && parsed.data.title).toBe("SwaraScribe Learn")
   })
 
   it("rejects a blank or whitespace-only title rather than storing an empty heading", () => {
@@ -83,6 +83,39 @@ describe("werftAppPayloadSchema", () => {
   it("rejects a missing field rather than defaulting it", () => {
     const { description: _description, ...withoutDescription } = valid
     expect(werftAppPayloadSchema.safeParse(withoutDescription).success).toBe(false)
+  })
+
+  /**
+   * Every app scaffolded before graphify existed posts no graph, and an app
+   * whose graph build failed should still register itself.
+   */
+  it("treats graph as optional", () => {
+    expect(werftAppPayloadSchema.safeParse(valid).success).toBe(true)
+  })
+
+  it("accepts a payload carrying a graph summary", () => {
+    const withGraph = {
+      ...valid,
+      graph: {
+        nodes: 12,
+        edges: 4,
+        communities: 2,
+        hubs: [{ label: "index.ts", degree: 4 }],
+        sample: {
+          nodes: [
+            { label: "index.ts", community: 0, degree: 4 },
+            { label: "db.ts", community: 1, degree: 1 },
+          ],
+          edges: [[0, 1]],
+        },
+      },
+    }
+    expect(werftAppPayloadSchema.safeParse(withGraph).success).toBe(true)
+  })
+
+  it("rejects a payload whose graph is malformed, rather than storing it", () => {
+    const bad = { ...valid, graph: { nodes: 12 } }
+    expect(werftAppPayloadSchema.safeParse(bad).success).toBe(false)
   })
 })
 

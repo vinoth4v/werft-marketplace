@@ -1,4 +1,5 @@
 import { boolean, index, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
+import type { GraphSummary } from "@/registry/graph-summary"
 
 /**
  * Append-only record of things worth knowing after the fact: sign-ins,
@@ -36,8 +37,8 @@ export const werftApp = pgTable(
     // Matches werft.json's name — also the GitHub repo, database and Coolify
     // app name, so it's unique by construction, not by convention.
     name: text("name").notNull().unique(),
-    // How the app brands itself — "SruthiScribe Learn", not
-    // "sruthiscribe-learn". Nullable: `name` has to be a valid repo, database
+    // How the app brands itself — "SwaraScribe Learn", not
+    // "swarascribe-learn". Nullable: `name` has to be a valid repo, database
     // and subdomain all at once, so it is a slug by necessity, and an app that
     // never sets a title just displays its slug as before.
     title: text("title"),
@@ -52,6 +53,11 @@ export const werftApp = pgTable(
     // serves — recorded once here rather than recomputed by every reader.
     repoUrl: text("repo_url").notNull(),
     lastDeployAt: timestamp("last_deploy_at", { withTimezone: true }).notNull().defaultNow(),
+    // A summary of the app's knowledge graph, posted by its CI alongside
+    // werft.json. Nullable rather than defaulted: "this app has never
+    // reported a graph" and "this app reported an empty one" are different
+    // facts, and only the first should render as nothing at all.
+    graph: jsonb("graph").$type<GraphSummary>(),
     health: text("health").notNull().default("unknown"),
     healthCheckedAt: timestamp("health_checked_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

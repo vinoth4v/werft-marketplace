@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { graphSummarySchema } from "./graph-summary"
 
 /**
  * What an app posts to /api/registry/upsert — the same shape as werft.json,
@@ -12,8 +13,8 @@ const NAME_PATTERN = /^[a-z][a-z0-9-]{0,38}[a-z0-9]$/
 export const werftAppPayloadSchema = z.object({
   name: z.string().regex(NAME_PATTERN),
   /**
-   * How the app brands itself, for display only — "SruthiScribe Learn" rather
-   * than the `sruthiscribe-learn` slug that `name` is forced to be by having
+   * How the app brands itself, for display only — "SwaraScribe Learn" rather
+   * than the `swarascribe-learn` slug that `name` is forced to be by having
    * to serve as a repo, a database and a subdomain at once.
    *
    * Optional, and never a substitute for `name`: nothing is looked up by it.
@@ -40,6 +41,15 @@ export const werftAppPayloadSchema = z.object({
    * nothing.
    */
   lastDeployAt: z.iso.datetime().optional(),
+  /**
+   * The app's knowledge graph, summarised by its own CI from the committed
+   * graphify-out/graph.json.
+   *
+   * Optional on purpose, and in both directions: an app scaffolded before
+   * graphify existed has none, and an app whose graph build failed should
+   * still register itself rather than drop off the wall over a visualisation.
+   */
+  graph: graphSummarySchema.optional(),
 })
 
 export type WerftAppPayload = z.infer<typeof werftAppPayloadSchema>

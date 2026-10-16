@@ -162,6 +162,17 @@ function AppCard({ app }: { app: WerftAppRow }) {
               {tag}
             </span>
           ))}
+          {/* Size of the app, as its own graph measures it. Only where one has
+              been reported — an absent graph shows nothing rather than a zero,
+              which would read as "empty app" instead of "never reported". */}
+          {app.graph && (
+            <span
+              className="badge badge-muted"
+              title={`${app.graph.nodes.toLocaleString()} nodes, ${app.graph.edges.toLocaleString()} edges across ${app.graph.communities} communities`}
+            >
+              {app.graph.nodes.toLocaleString()} nodes
+            </span>
+          )}
         </div>
       </Link>
       {app.url ? (

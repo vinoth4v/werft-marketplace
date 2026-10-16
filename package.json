@@ -17,7 +17,11 @@
     "db:generate": "pnpm --filter web run db:generate",
     "db:migrate": "pnpm --filter web run db:migrate",
     "hash-password": "node --experimental-strip-types apps/web/scripts/hash-password.ts",
-    "create-app": "node --experimental-strip-types packages/create-werft-app/src/cli.ts"
+    "create-app": "node --experimental-strip-types packages/create-werft-app/src/cli.ts",
+    "graph": "graphify extract . --code-only && graphify cluster-only .",
+    "graph:update": "graphify update .",
+    "graph:watch": "graphify . --watch",
+    "graph:open": "open graphify-out/graph.html"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.7",
